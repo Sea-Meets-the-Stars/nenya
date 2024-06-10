@@ -31,13 +31,19 @@ def fig_pca(outfile:str='fig_pca_variance.png'):
 
     # Load PCAs
     ds = []
-    datasets = ['MODIS_SST', 'VIIRS_SST']
+    datasets = ['MODIS_SST', 'VIIRS_SST', 'LLC_SST']
     #datasets = ['MODIS_SST']
     for dataset in datasets:
         d = np.load(f'../Analysis/pca_latents_{dataset}.npz')
         ds.append(d)
 
-    # Fit
+    # "Fit" 1
+    d = ds[0]
+    xs = np.arange(len(d['explained_variance'])) + 1
+    exponent = -0.5
+    ys = d['explained_variance'][10] * (xs/xs[10])**(exponent) 
+
+    # "Fit" 1
     d = ds[0]
     xs = np.arange(len(d['explained_variance'])) + 1
     exponent = -0.5
@@ -51,7 +57,7 @@ def fig_pca(outfile:str='fig_pca_variance.png'):
     for ss, d in enumerate(ds):
         ax.plot(xs, d['explained_variance'], 'o', label=datasets[ss])
         #ax.plot(xs, d['explained_variance'], 'o', label='Explained Variance')
-    ax.plot(xs, ys, '--', color='g', label=f'Power law: {exponent}')
+    ax.plot(xs, ys, '--', color='gray', label=f'Power law: {exponent}')
     # Label
     ax.set_ylabel('Variance explained per mode')
     ax.set_xlabel('Number of PCA components')
@@ -67,7 +73,7 @@ def fig_pca(outfile:str='fig_pca_variance.png'):
     #ax.axhline(0., color='k', ls='--')
 
     #loc = 'upper right' if ss == 1 else 'upper left'
-    ax.legend(fontsize=15)#, loc=loc)
+    ax.legend(fontsize=15, loc='lower left')
 
     # Turn on grid
     ax.grid(True, which='both', ls='--', lw=0.5)

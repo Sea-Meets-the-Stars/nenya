@@ -9,6 +9,7 @@ from sklearn import decomposition
 def pca_latents(dataset:str):
 
     # Load
+    key = 'valid'
     if dataset == 'MODIS_SST':
         filename = 'MODIS_R2019_2004_95clear_128x128_latents_std.h5'
         outfile='pca_latents_MODIS_SST.npz'
@@ -20,13 +21,20 @@ def pca_latents(dataset:str):
         outfile='pca_latents_VIIRS_SST.npz'
         path = os.path.join(os.getenv('OS_SST'), 'VIIRS',
                         'Nenya', 'latents', 'VIIRS_v1') 
+    elif dataset == 'LLC_SST':
+        filename = 'LLC_nenya_training.h5'
+        outfile='pca_latents_LLC_SST.npz'
+        path = os.path.join(os.getenv('OS_OGCM'), 'LLC',
+                        'Nenya', 'latents', 'LLC_v1') 
+        key = 'train'
     else:
         raise IOError("Bad dataset: {}".format(dataset))
 
+    # Load
     fpath = os.path.join(path, filename)
     print(f'Loading: {fpath}')
     f = h5py.File(fpath, 'r')
-    latents = f['valid'][:]
+    latents = f[key][:]
     f.close()
 
     # PCA
@@ -47,7 +55,10 @@ def pca_latents(dataset:str):
 # Command line execution
 if __name__ == '__main__':
     # PCA MODIS SST
-    pca_latents('MODIS_SST')
+    #pca_latents('MODIS_SST')
 
     #  VIIRS SST
     #pca_latents('VIIRS_SST')
+
+    #  LLC SST
+    pca_latents('LLC_SST')

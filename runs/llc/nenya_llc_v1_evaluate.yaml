@@ -50,7 +50,7 @@ spec:
             git pull; 
             pip install -e ".[dev]";
             cd runs/llc;
-            python -u nenya_llc.py evaluate --opt_path opts_llc.json;
+            python -u nenya_llc.py evaluate --opt_path opts_llc_v1.json;
         env:
           - name: "ENDPOINT_URL"
             value: "http://rook-ceph-rgw-nautiluss3.rook"

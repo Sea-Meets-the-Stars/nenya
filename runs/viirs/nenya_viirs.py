@@ -97,7 +97,8 @@ def evaluate(opt_path, debug=False, clobber=False):
             print(f'{data_file} removed')
 
 
-def umap_me(opt_path:str, debug=False, local=True, metric:str='DT40'):
+def umap_me(opt_path:str, debug=False, local=True, 
+            metric:str='DT'):
     """Run a UMAP analysis on all the VIIRS L2 data
     v5 model
 
@@ -108,6 +109,8 @@ def umap_me(opt_path:str, debug=False, local=True, metric:str='DT40'):
         ntrain (int, optional): Number of random latent vectors to use to train the UMAP model
         debug (bool, optional): For testing and debuggin 
         ndim (int, optional): Number of dimensions for the embedding
+        metric (str, optional): Metric to use for UMAP
+            TODO -- Use DT40
     """
     # Load up the options file
     opt = params.Params(opt_path)
@@ -182,6 +185,7 @@ def umap_me(opt_path:str, debug=False, local=True, metric:str='DT40'):
                              outfile, 
                              local=local,
                              DT_cut=DT_cut, 
+                             DT_key='DT',
                              alpha_cut=alpha_cut, 
                              debug=debug, 
                              train_umap=train_umap, 

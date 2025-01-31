@@ -111,11 +111,12 @@ def load(model_name:str, DT:float=None, use_s3:bool=False):
     # Return
     return pickle.load(ulmo_io.open(umap_base, "rb")), tbl_file
 
-def umap_subset(modis_tbl:pandas.DataFrame, 
+def umap_subset(tbl:pandas.DataFrame, 
                 opt_path:str, outfile:str, 
                 DT_cut:str=None, 
                 alpha_cut:str=None, 
                 ntrain=200000, remove=True,
+                DT_key:str='DT40',
                 umap_savefile:str=None,
                 train_umap:bool=True,
                 local=True, CF=False, debug=False):
@@ -123,10 +124,10 @@ def umap_subset(modis_tbl:pandas.DataFrame,
     First 2 dimensions are written to the table
 
     Args:
-        modis_tbl (pandas.DataFrame): MODIS table
+        tbl (pandas.DataFrame): Data table
         opt_path (str): _description_
         outfile (str): _description_
-        DT_cut (str, optional): DT40 cut to apply. Defaults to None.
+        DT_cut (str, optional): DT cut to apply. Defaults to None.
         alpha_cut (str, optional): alpha cut to apply. Defaults to None.
         ntrain (int, optional): _description_. Defaults to 200000.
         remove (bool, optional): _description_. Defaults to True.
@@ -145,34 +146,34 @@ def umap_subset(modis_tbl:pandas.DataFrame,
 
     # Load main table
     table='CF' if CF else '96'
-    modis_tbl['US0'] = 0.
-    modis_tbl['US1'] = 0.
+    tbl['US0'] = 0.
+    tbl['US1'] = 0.
 
     # Cut down on DT
     if DT_cut is not None:
         DT_cuts = defs.umap_DT[DT_cut]
         if DT_cuts[1] < 0: # Lower limit?
-            keep = modis_tbl.DT40 > DT_cuts[0]
+            keep = tbl[DT_key] > DT_cuts[0]
         else:
-            keep = np.abs(modis_tbl.DT40 - DT_cuts[0]) < DT_cuts[1]
+            keep = np.abs(tbl[DT_key] - DT_cuts[0]) < DT_cuts[1]
     else: # Do em all! (or cut on alpha)
-        keep = np.ones(len(modis_tbl), dtype=bool)
+        keep = np.ones(len(tbl), dtype=bool)
 
     # Cut down on alpha
     if DT_cut is None and alpha_cut is not None:
         alpha_cuts = defs.umap_alpha[alpha_cut]
         if alpha_cuts[1] < 0: # Upper limit?
-            keep = modis_tbl.min_slope < alpha_cuts[0]
+            keep = tbl.min_slope < alpha_cuts[0]
         else:
-            keep = np.abs(modis_tbl.min_slope - alpha_cuts[0]) < alpha_cuts[1]
+            keep = np.abs(tbl.min_slope - alpha_cuts[0]) < alpha_cuts[1]
 
-    modis_tbl = modis_tbl[keep].copy()
-    print(f"After the cuts, we have {len(modis_tbl)} cutouts to work on.")
+    tbl = tbl[keep].copy()
+    print(f"After the cuts, we have {len(tbl)} cutouts to work on.")
 
     # 
     if table in ['CF', '96']:
-        valid = modis_tbl.ulmo_pp_type == 0
-        train = modis_tbl.ulmo_pp_type == 1
+        valid = tbl.ulmo_pp_type == 0
+        train = tbl.ulmo_pp_type == 1
         cut_prefix = 'ulmo_'
     else:
         raise IOError("Need to deal with this")
@@ -218,9 +219,9 @@ def umap_subset(modis_tbl:pandas.DataFrame,
         # ##############33
         # Valid
         all_latents_valid = hf['valid'][:]
-        yidx = modis_tbl.pp_file == f's3://modis-l2/PreProc/MODIS_R2019_{year}_95clear_128x128_preproc_std.h5'
+        yidx = tbl.pp_file == f's3://modis-l2/PreProc/MODIS_R2019_{year}_95clear_128x128_preproc_std.h5'
         valid_idx = valid & yidx
-        pp_idx = modis_tbl[valid_idx].pp_idx.values
+        pp_idx = tbl[valid_idx].pp_idx.values
 
         # Grab and save
         gd_latents = all_latents_valid[pp_idx, :]
@@ -230,7 +231,7 @@ def umap_subset(modis_tbl:pandas.DataFrame,
         # Train
         train_idx = train & yidx
         if 'train' in hf.keys() and (np.sum(train_idx) > 0):
-            pp_idx = modis_tbl[train_idx].pp_idx.values
+            pp_idx = tbl[train_idx].pp_idx.values
             all_latents_train = hf['train'][:]
             gd_latents = all_latents_train[pp_idx, :]
             all_latents.append(gd_latents)
@@ -274,27 +275,27 @@ def umap_subset(modis_tbl:pandas.DataFrame,
 
     # Save
     srt = np.argsort(sv_idx)
-    gd_idx = np.zeros(len(modis_tbl), dtype=bool)
+    gd_idx = np.zeros(len(tbl), dtype=bool)
     gd_idx[sv_idx] = True
-    modis_tbl.US0.values[gd_idx] = embedding[srt,0]
-    modis_tbl.US1.values[gd_idx] = embedding[srt,1]
-    #modis_tbl.loc[gd_idx, 'US0'] = embedding[srt,0]
-    #modis_tbl.loc[gd_idx, 'US1'] = embedding[srt,1]
+    tbl.US0.values[gd_idx] = embedding[srt,0]
+    tbl.US1.values[gd_idx] = embedding[srt,1]
+    #tbl.loc[gd_idx, 'US0'] = embedding[srt,0]
+    #tbl.loc[gd_idx, 'US1'] = embedding[srt,1]
 
     # Remove DT
     drop_columns = []
     for key in ['DT', 'logDT', 'lowDT', 'absDT', 'min_slope']: 
-        if key in modis_tbl.keys():
+        if key in tbl.keys():
             drop_columns.append(key)
     if len(drop_columns) > 0:
-        modis_tbl.drop(columns=drop_columns, inplace=True)
+        tbl.drop(columns=drop_columns, inplace=True)
     
     # Vet
-    assert cat_utils.vet_main_table(modis_tbl, cut_prefix=cut_prefix)
+    assert cat_utils.vet_main_table(tbl, cut_prefix=cut_prefix)
     # Write new table
     to_s3 = True if 's3' in outfile else False
     if not debug:
-        ulmo_io.write_main_table(modis_tbl, outfile, to_s3=to_s3)
+        ulmo_io.write_main_table(tbl, outfile, to_s3=to_s3)
 
 def grid_umap(U0:np.ndarray, U1:np.ndarray, nxy:int=16, 
               percent:list=[0.05, 99.95], verbose=False):

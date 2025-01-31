@@ -55,13 +55,10 @@ def load(model_name:str, DT:float=None, use_s3:bool=False):
         umap_file = 's3://llc/SSL/LLC_MODIS_2012_model/ssl_LLC_v1_umap.pkl'
     elif model_name == 'LLC_local':
         umap_file = './ssl_LLC_v1_umap.pkl'
-    elif model_name in ['CF', 'v4', 'v5']:
-        if use_s3:
-            raise IOError("Not ready for s3!")
-        else:
-            umap_path = os.path.join(os.getenv('OS_SST'),
-                                 'MODIS_L2', 'Nenya', 'UMAP')
+    elif model_name in ['CF', 'v4', 'v5', 'viirs_v1']: 
         # Root
+        sensor = 'VIIRS' if model_name == 'viirs_v1' else 'MODIS'
+        tbl_pth = 'VIIRS' if model_name == 'viirs_v1' else 'MODIS_L2'
         if model_name == 'CF':
             umap_root = 'cloud_free'
             nname = 'SSL'
@@ -71,8 +68,17 @@ def load(model_name:str, DT:float=None, use_s3:bool=False):
         elif model_name == 'v5':  # Probably lost to the vaguries of UMAP pickeling
             umap_root = '96clear_v5'
             nname = 'Nenya'
+        elif model_name == 'viirs_v1':  # VIIRS model
+            umap_root = 'v1'
+            nname = 'Nenya_98clear'
         else:
             raise IOError("Bad model_name")
+
+        if use_s3:
+            raise IOError("Not ready for s3!")
+        else:
+            umap_path = os.path.join(os.getenv('OS_SST'),
+                                 tbl_pth, 'Nenya', 'UMAP')
         
         for key in ssl_defs.umap_DT.keys():
             if key in ['all', 'DT10']:
@@ -81,10 +87,10 @@ def load(model_name:str, DT:float=None, use_s3:bool=False):
             if DT_rng[0] < DT <= DT_rng[1]:
                 umap_file = os.path.join(
                     umap_path, 
-                    f'MODIS_{nname}_{umap_root}_{key}_UMAP.pkl')
+                    f'{sensor}_{nname}_{umap_root}_{key}_UMAP.pkl')
                                     
         tbl_file = os.path.join(
-            os.getenv('OS_SST'), 'MODIS_L2', 'Nenya', 'Tables', 
+            os.getenv('OS_SST'), tbl_pth, 'Nenya', 'Tables', 
             os.path.basename(umap_file).replace(
                 '_UMAP.pkl', '.parquet'))
     else:
@@ -100,6 +106,7 @@ def load(model_name:str, DT:float=None, use_s3:bool=False):
     print(f"Loading UMAP: {umap_base}")
 
     # Return
+    embed(header='umap 108')
     return pickle.load(ulmo_io.open(umap_base, "rb")), tbl_file
 
 def umap_subset(modis_tbl:pandas.DataFrame, 

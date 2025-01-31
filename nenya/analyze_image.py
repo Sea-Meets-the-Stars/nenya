@@ -1,6 +1,7 @@
 """ Module to explore an input image """
 import os
 import numpy as np
+from importlib import reload
 
 import umap
 
@@ -48,12 +49,12 @@ def get_latents(img:np.ndarray,
         drop_last=False, num_workers=1)
 
     # Time to run
-    latents = latents_extraction.model_latents_extract(
-        opt, 'None', 'valid', 
-        model_file, None, None,
-         loader=data_loader)
+    latent_dict = latents_extraction.model_latents_extract(
+        opt, None, model_file, partitions=['valid'],
+         in_loader=data_loader)
 
     # Return
+    latents = latent_dict['valid']
     return latents, pp_img
 
 def calc_DT(images, random_jitter:list,
@@ -135,6 +136,7 @@ def umap_image(nenya_model:str, img:np.ndarray):
     # UMAP me
     #embed(header='umap_image: about to embed')
     print("Embedding")
+    reload(nenya_umap)
     latents_mapping, table_file = nenya_umap.load(nenya_model, DT=DT)
     embedding = latents_mapping.transform(latents)
 

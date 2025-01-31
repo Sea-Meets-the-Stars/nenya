@@ -8,6 +8,8 @@ from nenya import params
 #  i.e. DON'T REMOVE IT!
 Params = params.Params
 
+from IPython import embed
+
 def load_opt(nenya_model:str):
     """ Load the SSL model options
 
@@ -21,6 +23,7 @@ def load_opt(nenya_model:str):
     Returns:
         tuple: Nenya options, model file (str)
     """
+    #embed(header='load_opt 24')
     # Prep
     nenya_model_file = None
     if nenya_model == 'LLC' or nenya_model == 'LLC_local':

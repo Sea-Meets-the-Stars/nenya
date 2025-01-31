@@ -14,7 +14,7 @@ import tqdm
 from ulmo.utils import id_collate
 from ulmo import io as ulmo_io
 
-from nenya.train_util import option_preprocess
+from nenya.params import option_preprocess
 from nenya.train_util import set_model
 from nenya import io as nenya_io
 
@@ -181,8 +181,9 @@ def prep(opt):
 
 def model_latents_extract(opt, data_file, 
                           model_path, 
-                          remove_module=True, loader=None,
-                          partitions=('train', 'valid'),
+                          remove_module:bool=True, 
+                          in_loader=None,
+                          partitions:tuple=('train', 'valid'),
                           allowed_indices=None,
                           debug:bool=False):
     """
@@ -195,7 +196,7 @@ def model_latents_extract(opt, data_file,
         model_path: (string) path of the saved model file.
         save_path: (string or None) path for saving the latents.
         partitions: (list) list of keys in the h5py file [e.g. 'train', 'valid'].
-        loader: (torch.utils.data.DataLoader, optional) Use this DataLoader, if provided
+        in_loader: (torch.utils.data.DataLoader, optional) Use this DataLoader, if provided
         allowed_indices: (np.ndarray) Set of images that can be grabbed
 
     Returns:
@@ -224,17 +225,21 @@ def model_latents_extract(opt, data_file,
     # Loop on partitions
     latent_dict = {}
     for partition in partitions:
-        # parition exists?
-        with h5py.File(data_file, 'r') as f:
-            if partition in f.keys():
-                print(f"Working on: {partition}")
-            else:
-                print(f"Partition {partition} not found in {data_file}")
-                continue 
-        # Data
-        _, loader = build_loader(data_file, partition, 
-                                    batch_size_eval, num_workers_eval,
-                                    allowed_indices=allowed_indices)
+        if in_loader is None:
+            # parition exists?
+            with h5py.File(data_file, 'r') as f:
+                if partition in f.keys():
+                    print(f"Working on: {partition}")
+                else:
+                    print(f"Partition {partition} not found in {data_file}")
+                    continue 
+            # Data
+            _, loader = build_loader(data_file, partition, 
+                                        batch_size_eval, num_workers_eval,
+                                        allowed_indices=allowed_indices)
+        else:
+            loader = in_loader
+
         # Debug?
         if debug:
             total = 2

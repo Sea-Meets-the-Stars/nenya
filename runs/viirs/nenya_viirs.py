@@ -21,7 +21,8 @@ from ulmo import io as ulmo_io
 from nenya import train as nenya_train
 from nenya import latents_extraction
 from nenya import io as nenya_io
-from nenya.train_util import option_preprocess
+from nenya import params 
+from nenya import nenya_umap
 
 from IPython import embed
 
@@ -50,7 +51,7 @@ def evaluate(opt_path, debug=False, clobber=False):
             If true, over-write any existing file
     """
     # Parse the model
-    opt = nenya_io.Params(opt_path)
+    opt = params.Params(opt_path)
     option_preprocess(opt)
 
     # Prep
@@ -95,6 +96,98 @@ def evaluate(opt_path, debug=False, clobber=False):
             os.remove(data_file)
             print(f'{data_file} removed')
 
+
+def umap_me(opt_path:str, debug=False, local=True, metric:str='DT40'):
+    """Run a UMAP analysis on all the VIIRS L2 data
+    v5 model
+
+    2 dimensions
+
+    Args:
+        model_name: (str) model name 
+        ntrain (int, optional): Number of random latent vectors to use to train the UMAP model
+        debug (bool, optional): For testing and debuggin 
+        ndim (int, optional): Number of dimensions for the embedding
+    """
+    # Load up the options file
+    opt = params.option_preprocess(params.Params(opt_path))
+
+    # Load v5 Table
+    if local:
+        tbl_file = os.path.join(os.getenv('OS_SST'),
+                                'VIIRS', 'Nenya', 'Tables', 
+                                os.path.basename(opt.tbl_file))
+    else:                            
+        tbl_file = opt.tbl_file
+    viirs_tbl = ulmo_io.load_main_table(tbl_file)
+
+    # Add slope
+    viirs_tbl['min_slope'] = np.minimum(
+        viirs_tbl.zonal_slope, viirs_tbl.merid_slope)
+
+    # Base
+    base1 = 'viirs_v1'
+
+    if 'DT' in metric: 
+        subsets =  ['DT15', 'DT0', 'DT1', 'DT2', 'DT4', 'DT5', 'DTall']
+        if debug:
+            subsets = ['DT5']
+    elif metric == 'alpha':
+        subsets = list(nenya_defs.umap_alpha.keys())
+        if debug:
+            subsets = ['a0']
+    else:
+        raise ValueError("Bad metric")
+
+    # Loop me
+    for subset in subsets:
+        # Files
+        outfile = os.path.join(
+            os.getenv('OS_SST'), 
+            f'VIIRS/Nenya/Tables/VIIRS_Nenya_{base1}_{subset}.parquet')
+        if debug:
+            umap_savefile = 'umap_test.pkl'
+        else:
+            umap_savefile = os.path.join(
+                os.getenv('OS_SST'), 
+                f'VIIRS/Nenya/UMAP/VIIRS_Nenya_{base1}_{subset}_UMAP.pkl')
+
+        DT_cut = None 
+        alpha_cut = None 
+        if 'DT' in metric:
+            # DT cut
+            DT_cut = None if subset == 'DTall' else subset
+        elif metric == 'alpha':
+            alpha_cut = subset
+        else:
+            raise ValueError("Bad metric")
+
+        #if debug:
+        #    embed(header='86 of v5')
+
+        # Run
+        if os.path.isfile(umap_savefile):
+            print(f"Skipping UMAP training as {umap_savefile} already exists")
+            train_umap = False
+        else:
+            train_umap = True
+        # Can't do both so quick check
+        if DT_cut is not None and alpha_cut is not None:
+            raise ValueError("Can't do both DT and alpha cuts")
+
+        # Do it
+        nenya_umap.umap_subset(viirs_tbl.copy(),
+                             opt_path, 
+                             outfile, 
+                             local=local,
+                             DT_cut=DT_cut, 
+                             alpha_cut=alpha_cut, 
+                             debug=debug, 
+                             train_umap=train_umap, 
+                             umap_savefile=umap_savefile,
+                             remove=False, CF=False)
+        print(f"Done with {subset}")
+    print("All done!")
 
 def parse_option():
     """
@@ -152,12 +245,12 @@ if __name__ == "__main__":
         print("Evaluation Ends.")
         # python -u nenya_viirs.py evaluate --opt_path opts_viirs_v1.json 
 
-    # python ssl_modis_v4.py --func_flag extract_new --ncpu 20 --local --years 2020 --debug
-    if args.func_flag == 'extract_new':
-        ncpu = args.ncpu if args.ncpu is not None else 10
-        years = [int(item) for item in args.years.split(',')] if args.years is not None else [2020,2021]
-        extract_modis(debug=args.debug, n_cores=ncpu, local=args.local, years=years)
+    # python ssl_modis_v4.py --func_flag umap --debug --local
+    if args.func_flag == 'umap':
+        umap_me(args.opt_path, debug=args.debug, local=args.local)
+        # python -u nenya_viirs.py umap --opt_path opts_viirs_v1.json  --local
 
+    '''
     # python ssl_modis_v4.py --func_flag revert_mask --debug
     if args.func_flag == 'revert_mask':
         revert_mask(debug=args.debug)
@@ -196,4 +289,5 @@ if __name__ == "__main__":
     # python ssl_modis_v4.py --func_flag alpha --debug --local
     if args.func_flag == 'alpha':
         ssl_v4_umap(args.opt_path, metric='alpha', debug=args.debug, local=args.local)
+    '''
 

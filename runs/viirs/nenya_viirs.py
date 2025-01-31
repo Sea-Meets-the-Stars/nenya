@@ -116,7 +116,7 @@ def umap_me(opt_path:str, debug=False, local=True, metric:str='DT40'):
     # Load v5 Table
     if local:
         tbl_file = os.path.join(os.getenv('OS_SST'),
-                                'VIIRS', 'Nenya', 'Tables', 
+                                'VIIRS', 'Tables', 
                                 os.path.basename(opt.tbl_file))
     else:                            
         tbl_file = opt.tbl_file

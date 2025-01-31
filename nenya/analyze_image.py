@@ -6,16 +6,16 @@ import umap
 
 import torch
 
-from ulmo.nenya import latents_extraction
-from ulmo.nenya import io as ssl_io
-from ulmo import io as ulmo_io
-from ulmo.nenya import nenya_umap
+from nenya import latents_extraction
+from nenya import io as nenya_io
+from nenya import nenya_umap
+from nenya import params
 
 from IPython import embed
 
 def get_latents(img:np.ndarray, 
                 model_file:str, 
-                opt:ulmo_io.Params):
+                opt:params.Params):
     """ Get the Nenya latents for an input image
 
     Args:
@@ -25,7 +25,8 @@ def get_latents(img:np.ndarray,
             Full path to the Nenya model file, e.g. $OS_SST/MODIS_L2/Nenya/models/v4_last.pth
             Must be on the local filesystem (s3 is not allowed)
         opt (ulmo_io.Params): 
-            Parameters for the SSL model
+            Parameters for the Nenya model, e.g. 
+                ~/runs/viiirs/opts_viirs_v1.json
 
     Returns:
         tuple: latents (np.ndarray), pre-processed image (np.ndarray) 
@@ -118,13 +119,14 @@ def umap_image(nenya_model:str, img:np.ndarray):
     Returns:
         tuple: UMAP embedding, pre-processed image (np.ndarray), 
             name of table file associated with this UMAP (str), DT (float)
+            latents (np.ndarray)
     """
 
     # Load opt
-    opt, ssl_model_file = ssl_io.load_opt(nenya_model)
+    opt, nenya_model_file = nenya_io.load_opt(nenya_model)
 
     # Calculate latents
-    latents, pp_img = get_latents(img, ssl_model_file, opt)
+    latents, pp_img = get_latents(img, nenya_model_file, opt)
 
     # DT40
     DT = calc_DT(img, opt.random_jitter)
@@ -139,4 +141,4 @@ def umap_image(nenya_model:str, img:np.ndarray):
     print(f'U0,U1 for the input image = {embedding[0,0]:.3f}, {embedding[0,1]:.3f}')
 
     # Return
-    return embedding, pp_img, table_file, DT
+    return embedding, pp_img, table_file, DT, latents

@@ -8,7 +8,8 @@ from tqdm.auto import trange
 
 from nenya import io as nenya_io
 from nenya.train_util import set_model, train_model
-from nenya.train_util import option_preprocess, nenya_loader
+from nenya.train_util import nenya_loader
+from nenya.params import option_preprocess
 from nenya.util import set_optimizer, save_model
 from nenya.util import adjust_learning_rate
 

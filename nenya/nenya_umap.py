@@ -7,10 +7,13 @@ import h5py
 import pandas
 import umap
 
-#from ulmo import io as ulmo_io
+from ulmo import io as ulmo_io
+from ulmo.utils import catalog as cat_utils
 #from ulmo.nenya.train_util import option_preprocess
-#from ulmo.utils import catalog as cat_utils
 #from ulmo.nenya import defs as ssl_defs
+
+from nenya import params
+from nenya import defs
 
 from IPython import embed
 
@@ -106,7 +109,6 @@ def load(model_name:str, DT:float=None, use_s3:bool=False):
     print(f"Loading UMAP: {umap_base}")
 
     # Return
-    embed(header='umap 108')
     return pickle.load(ulmo_io.open(umap_base, "rb")), tbl_file
 
 def umap_subset(modis_tbl:pandas.DataFrame, 
@@ -139,7 +141,7 @@ def umap_subset(modis_tbl:pandas.DataFrame,
         IOError: _description_
     """
 
-    opt = option_preprocess(ulmo_io.Params(opt_path))
+    opt = params.option_preprocess(params.Params(opt_path))
 
     # Load main table
     table='CF' if CF else '96'
@@ -148,7 +150,7 @@ def umap_subset(modis_tbl:pandas.DataFrame,
 
     # Cut down on DT
     if DT_cut is not None:
-        DT_cuts = ssl_defs.umap_DT[DT_cut]
+        DT_cuts = defs.umap_DT[DT_cut]
         if DT_cuts[1] < 0: # Lower limit?
             keep = modis_tbl.DT40 > DT_cuts[0]
         else:
@@ -158,7 +160,7 @@ def umap_subset(modis_tbl:pandas.DataFrame,
 
     # Cut down on alpha
     if DT_cut is None and alpha_cut is not None:
-        alpha_cuts = ssl_defs.umap_alpha[alpha_cut]
+        alpha_cuts = defs.umap_alpha[alpha_cut]
         if alpha_cuts[1] < 0: # Upper limit?
             keep = modis_tbl.min_slope < alpha_cuts[0]
         else:
@@ -407,8 +409,8 @@ def regional_analysis(geo_region:str, tbl:pandas.DataFrame, nxy:int,
     counts /= np.sum(counts)
 
     # Geographic
-    lons = ssl_defs.geo_regions[geo_region]['lons']
-    lats = ssl_defs.geo_regions[geo_region]['lats']
+    lons = defs.geo_regions[geo_region]['lons']
+    lats = defs.geo_regions[geo_region]['lats']
     #embed(header='739 of figs')
     geo = ( (tbl.lon > lons[0]) &
         (tbl.lon < lons[1]) &

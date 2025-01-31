@@ -7,10 +7,10 @@ import h5py
 import pandas
 import umap
 
-from ulmo import io as ulmo_io
-from ulmo.nenya.train_util import option_preprocess
-from ulmo.utils import catalog as cat_utils
-from ulmo.nenya import defs as ssl_defs
+#from ulmo import io as ulmo_io
+#from ulmo.nenya.train_util import option_preprocess
+#from ulmo.utils import catalog as cat_utils
+#from ulmo.nenya import defs as ssl_defs
 
 from IPython import embed
 

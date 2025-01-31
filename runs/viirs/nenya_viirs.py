@@ -123,8 +123,8 @@ def umap_me(opt_path:str, debug=False, local=True, metric:str='DT40'):
     viirs_tbl = ulmo_io.load_main_table(tbl_file)
 
     # Add slope
-    viirs_tbl['min_slope'] = np.minimum(
-        viirs_tbl.zonal_slope, viirs_tbl.merid_slope)
+    #viirs_tbl['min_slope'] = np.minimum(
+    #    viirs_tbl.zonal_slope, viirs_tbl.merid_slope)
 
     # Base
     base1 = 'viirs_v1'

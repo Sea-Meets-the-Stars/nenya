@@ -50,7 +50,9 @@ def prep_nenya_table(opt_path:str, debug=False):
 
     # Check for the Table
     chk_tbl_file = ulmo_io.list_of_bucket_files(opt.nenya_tbl_file)
-    embed(header='48 of viirs')
+    if len(chk_tbl_file) > 0:
+        print(f"Table already exists: {opt.nenya_tbl_file}")
+        return
 
     # Data files
     all_pp_files = ulmo_io.list_of_bucket_files('viirs', 'PreProc')

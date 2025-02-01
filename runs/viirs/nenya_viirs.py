@@ -87,7 +87,10 @@ def prep_nenya_table(opt_path:str, debug=False):
             #
             print(f"Working on {itype}")
             images = f[itype][:]
-            DT40s = analyze_image.calc_DT(images, opt.random_jitter)
+            embed(header='90 of nenya')
+            DT40s = analyze_image.calc_DT(
+                images, opt.random_jitter, 
+                verbose=True)
             # Fill
             ppt = -1 if itype == 'valid' else 1
             idx = (viirs_tbl.ulmo_pp_file == ifile) & (viirs_tbl.ulmo_pp_type == ppt)

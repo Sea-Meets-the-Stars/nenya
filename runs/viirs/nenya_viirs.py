@@ -43,6 +43,10 @@ def train(opt_path:str, debug:bool=False, save_file:str=None):
 
 def prep_nenya_table(opt_path:str, debug=False):
     
+    # Check for the Table
+    chk_tbl_file = ulmo_io.list_of_bucket_files(opt.nenya_tbl_file)
+    embed(header='48 of viirs')
+
     # Parse the model
     opt = params.Params(opt_path)
     params.option_preprocess(opt)

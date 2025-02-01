@@ -107,12 +107,14 @@ def evaluate(opt_path, debug=False, clobber=False, preproc:str='_std'):
             ppt = 0 if itype == 'valid' else 1
             idx = (viirs_tbl.ulmo_pp_file == ifile) & (viirs_tbl.ulmo_pp_type == ppt)
             pp_idx = viirs_tbl[idx].ulmo_pp_idx.values
+            embed(header='110 of viirs')
             viirs_tbl.loc[idx, 'DT40'] = DT40s[pp_idx]
         f.close()
 
-        embed(header='65 of viirs')
+        embed(header='114 of viirs')
 
         # Extract
+        print("Extracting latents")
         latent_dict = latents_extraction.model_latents_extract(
             opt, data_file, model_base, debug=debug)
         # Save

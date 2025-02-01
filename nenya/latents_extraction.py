@@ -203,6 +203,7 @@ def model_latents_extract(opt, data_file,
         latent_dict: (dict) dictionary of latents for each partition.
     """
     using_gpu = torch.cuda.is_available()
+    print("Using GPU: ", using_gpu)
     model, _ = set_model(opt, cuda_use=using_gpu)
     if not using_gpu:
         model_dict = torch.load(model_path, map_location=torch.device('cpu'))

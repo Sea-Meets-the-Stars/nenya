@@ -17,6 +17,7 @@ from matplotlib import pyplot as plt
 import seaborn as sns
 
 from ulmo import io as ulmo_io
+from ulmo.utils import catalog as cat_utils
 
 from nenya import train as nenya_train
 from nenya import latents_extraction
@@ -65,11 +66,13 @@ def evaluate(opt_path, debug=False, clobber=False, preproc:str='_std'):
         if opt.eval_root in ifile:
             pp_files.append(f's3://viirs/{ifile}')
 
-    embed(header='65 of viirs')
 
     # Table
     viirs_tbl = ulmo_io.load_main_table(opt.orig_tbl_file)
-    viirs_tbl.rename(columns={'pp_type':'ulmo_pp_type'}, inplace=True)
+    viirs_tbl.rename(columns={'pp_type':'ulmo_pp_type',
+                              'pp_idx':'ulmo_pp_idx', 
+                              'pp_file':'ulmo_pp_file'}, 
+                     inplace=True)
 
 
     for ifile in pp_files:
@@ -91,6 +94,7 @@ def evaluate(opt_path, debug=False, clobber=False, preproc:str='_std'):
             print(f"Data file already downloaded: {data_file}")
 
         # T40
+        print("Calculating DT40") 
         f = h5py.File(data_file, 'r')
         for itype in ['valid', 'train']:
             if itype not in f.keys():
@@ -101,11 +105,12 @@ def evaluate(opt_path, debug=False, clobber=False, preproc:str='_std'):
             DT40s = analyze_image.calc_DT(images, opt.random_jitter)
             # Fill
             ppt = 0 if itype == 'valid' else 1
-            idx = (viirs_tbl.pp_file == pfile) & (viirs_tbl.ulmo_pp_type == ppt)
+            idx = (viirs_tbl.ulmo_pp_file == ifile) & (viirs_tbl.ulmo_pp_type == ppt)
             pp_idx = viirs_tbl[idx].ulmo_pp_idx.values
             viirs_tbl.loc[idx, 'DT40'] = DT40s[pp_idx]
         f.close()
 
+        embed(header='65 of viirs')
 
         # Extract
         latent_dict = latents_extraction.model_latents_extract(
@@ -125,6 +130,11 @@ def evaluate(opt_path, debug=False, clobber=False, preproc:str='_std'):
             os.remove(data_file)
             print(f'{data_file} removed')
 
+    # Save the table
+    assert cat_utils.vet_main_table(viirs_tbl, cut_prefix='ulmo_')
+    if not debug:
+        ulmo_io.write_main_table(viirs_tbl, opt.nenya_tbl_file)
+    
 
 def umap_me(opt_path:str, debug=False, local=True, 
             metric:str='DT'):

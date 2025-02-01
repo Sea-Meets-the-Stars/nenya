@@ -89,13 +89,13 @@ def prep_nenya_table(opt_path:str, debug=False):
             images = f[itype][:]
             DT40s = analyze_image.calc_DT(
                 images, opt.random_jitter, 
-                verbose=True)
+                verbose=False)
             # Fill
-            ppt = -1 if itype == 'valid' else 1
-            idx = (viirs_tbl.ulmo_pp_file == ifile) & (viirs_tbl.ulmo_pp_type == ppt)
+            ppt = 0 if itype == 'valid' else 1
+            idx = (viirs_tbl.ulmo_pp_file == ifile) & (
+                viirs_tbl.ulmo_pp_type == ppt)
             pp_idx = viirs_tbl[idx].ulmo_pp_idx.values
-            viirs_tbl.loc[idx, 'DT40'] = DT40s[pp_idx]
-            embed(header='98 of nenya')
+            viirs_tbl.loc[idx.values, 'DT40'] = DT40s[pp_idx]
         f.close()
 
         # Remove data file

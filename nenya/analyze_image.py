@@ -72,9 +72,6 @@ def calc_DT(images, random_jitter:list,
     Returns:
         np.ndarray or float: DT
     """
-    if verbose:
-        print("Calculating T90")
-
     # If single image, reshape into fields
     single = False
     if len(images.shape) == 4:

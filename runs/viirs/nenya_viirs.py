@@ -65,7 +65,8 @@ def prep_nenya_table(opt_path:str, debug=False):
                               'pp_file':'ulmo_pp_file'}, 
                      inplace=True)
 
-    for ifile in pp_files:
+    #for ifile in pp_files:
+    for ifile in pp_files[0:2]:
         print(f"Working on {ifile}")
         data_file = os.path.basename(ifile)
 
@@ -89,7 +90,7 @@ def prep_nenya_table(opt_path:str, debug=False):
             ppt = -1 if itype == 'valid' else 1
             idx = (viirs_tbl.ulmo_pp_file == ifile) & (viirs_tbl.ulmo_pp_type == ppt)
             pp_idx = viirs_tbl[idx].ulmo_pp_idx.values
-            viirs_tbl.loc[idx, 'DT39'] = DT40s[pp_idx]
+            viirs_tbl.loc[idx, 'DT40'] = DT40s[pp_idx]
         f.close()
 
         # Remove data file

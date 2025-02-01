@@ -296,7 +296,7 @@ def nenya_loader(opt, valid=False):
     else:
         data_key = opt.valid_key
         batch_size = opt.batch_size_valid
-    data_file = os.path.join(opt.data_folder, opt.images_file) 
+    data_file = os.path.join(opt.data_folder, opt.images_file)
 
     modis_dataset = NenyaDataset(data_file, 
                                  transform=TwoCropTransform(transforms_compose), 

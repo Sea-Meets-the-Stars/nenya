@@ -58,7 +58,7 @@ def get_latents(img:np.ndarray,
     return latents, pp_img
 
 def calc_DT(images, random_jitter:list,
-              verbose=False, debug=False):
+              verbose=False):
     """Calculate DT for a given image or set of images
     using the random_jitter parameters
 
@@ -68,6 +68,7 @@ def calc_DT(images, random_jitter:list,
             but a variety of shapes is allowed
         random_jitter (list):
             range to crop, amount to randomly jitter
+        verbose (bool, optional): Print out progress. Defaults to False.
     Returns:
         np.ndarray or float: DT
     """
@@ -94,6 +95,9 @@ def calc_DT(images, random_jitter:list,
     if verbose:
         print(xcen, ycen, dx, dy)
     
+    # Calculate T90, T10
+    if verbose:
+        print("Calculating T90")
     T_90 = np.percentile(fields[..., xcen-dx:xcen+dx,
         ycen-dy:ycen+dy], 90., axis=(1,2))
     if verbose:

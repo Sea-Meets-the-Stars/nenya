@@ -23,6 +23,7 @@ from nenya import latents_extraction
 from nenya import io as nenya_io
 from nenya import params 
 from nenya import nenya_umap
+from nenya import analyze_image
 
 from IPython import embed
 
@@ -39,7 +40,7 @@ def train(opt_path:str, debug:bool=False, save_file:str=None):
     nenya_train.main(opt_path, debug=debug, save_file=save_file)
         
 
-def evaluate(opt_path, debug=False, clobber=False):
+def evaluate(opt_path, debug=False, clobber=False, preproc:str='_std'):
     """
     This function is used to obtain the latents of the trained model
     for all of VIIRS
@@ -52,13 +53,23 @@ def evaluate(opt_path, debug=False, clobber=False):
     """
     # Parse the model
     opt = params.Params(opt_path)
-    option_preprocess(opt)
+    params.option_preprocess(opt)
 
     # Prep
     model_base, existing_files = latents_extraction.prep(opt)
 
-    # Data afiles
-    pp_files = ['s3://viirs/PreProc/VIIRS_2013_98clear_192x192_preproc_viirs_std_train.h5']
+    # Data files
+    all_pp_files = ulmo_io.list_of_bucket_files('viirs', 'PreProc')
+    pp_files = []
+    for ifile in all_pp_files:
+        if opt.eval_root in ifile:
+            pp_files.append(ifile)
+
+    embed(header='65 of viirs')
+
+    # Table
+    viirs_tbl = ulmo_io.load_main_table(opt.orig_tbl_file)
+
 
     for ifile in pp_files:
         print(f"Working on {ifile}")
@@ -77,6 +88,15 @@ def evaluate(opt_path, debug=False, clobber=False):
             ulmo_io.download_file_from_s3(data_file, ifile)
         else:
             print(f"Data file already downloaded: {data_file}")
+
+        # T40
+        f = h5py.File(data_file, 'r')
+        images = f['valid'][:]
+        DT40s = analyze_image.calc_DT(images, opt.random_jitter)
+        viirs_tbl.loc[idx, 'DT40'] = DT_40[pp_idx]
+
+        if 'train' in f.keys():
+            DT40(f, modis_tbl, pfile, itype='train', verbose=debug)
 
         # Extract
         latent_dict = latents_extraction.model_latents_extract(

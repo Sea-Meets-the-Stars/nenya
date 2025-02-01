@@ -9,7 +9,7 @@ from tqdm.auto import trange
 from nenya import io as nenya_io
 from nenya.train_util import set_model, train_model
 from nenya.train_util import nenya_loader
-from nenya.params import option_preprocess
+from nenya import params 
 from nenya.util import set_optimizer, save_model
 from nenya.util import adjust_learning_rate
 
@@ -24,10 +24,10 @@ def main(opt_path: str, debug:bool=False, save_file:str=None):
         save_file (str, optional): The path to save the trained model. Defaults to None.
     """
     # loading parameters json file
-    opt = nenya_io.Params(opt_path)
+    opt = params.Params(opt_path)
     if debug:
         opt.epochs = 2
-    option_preprocess(opt)
+    params.option_preprocess(opt)
 
     # Save opts
     opt.save(os.path.join(opt.model_folder, 

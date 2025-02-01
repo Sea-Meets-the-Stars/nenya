@@ -78,7 +78,7 @@ def calc_DT(images, random_jitter:list,
     # If single image, reshape into fields
     single = False
     if len(images.shape) == 4:
-        fields = images[...,0,...]
+        fields = images[:,0,...]
     elif len(images.shape) == 2:
         fields = np.expand_dims(images, axis=0) 
         single = True

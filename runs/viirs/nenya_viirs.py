@@ -63,7 +63,7 @@ def evaluate(opt_path, debug=False, clobber=False, preproc:str='_std'):
     pp_files = []
     for ifile in all_pp_files:
         if opt.eval_root in ifile:
-            pp_files.append(ifile)
+            pp_files.append(f's3://viirs/{ifile}')
 
     embed(header='65 of viirs')
 
@@ -103,9 +103,9 @@ def evaluate(opt_path, debug=False, clobber=False, preproc:str='_std'):
             ppt = 0 if itype == 'valid' else 1
             idx = (viirs_tbl.pp_file == pfile) & (viirs_tbl.ulmo_pp_type == ppt)
             pp_idx = viirs_tbl[idx].ulmo_pp_idx.values
+            viirs_tbl.loc[idx, 'DT40'] = DT40s[pp_idx]
+        f.close()
 
-        if 'train' in f.keys():
-            DT40(f, modis_tbl, pfile, itype='train', verbose=debug)
 
         # Extract
         latent_dict = latents_extraction.model_latents_extract(

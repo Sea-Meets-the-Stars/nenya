@@ -41,7 +41,55 @@ def train(opt_path:str, debug:bool=False, save_file:str=None):
     nenya_train.main(opt_path, debug=debug, save_file=save_file)
         
 
-def evaluate(opt_path, debug=False, clobber=False, preproc:str='_std'):
+def prep_nenya_table(opt_path:str, debug=False):
+    
+    # Parse the model
+    opt = params.Params(opt_path)
+    params.option_preprocess(opt)
+
+    # Data files
+    all_pp_files = ulmo_io.list_of_bucket_files('viirs', 'PreProc')
+    pp_files = []
+    for ifile in all_pp_files:
+        if opt.eval_root in ifile:
+            pp_files.append(f's3://viirs/{ifile}')
+
+    # Table
+    viirs_tbl = ulmo_io.load_main_table(opt.orig_tbl_file)
+    viirs_tbl.rename(columns={'pp_type':'ulmo_pp_type',
+                              'pp_idx':'ulmo_pp_idx', 
+                              'pp_file':'ulmo_pp_file'}, 
+                     inplace=True)
+
+    for ifile in pp_files:
+        print(f"Working on {ifile}")
+        data_file = os.path.basename(ifile)
+
+        # T40
+        print("Calculating DT40") 
+        f = h5py.File(data_file, 'r')
+        for itype in ['valid', 'train']:
+            if itype not in f.keys():
+                continue
+            #
+            print(f"Working on {itype}")
+            images = f[itype][:]
+            DT40s = analyze_image.calc_DT(images, opt.random_jitter)
+            # Fill
+            ppt = -1 if itype == 'valid' else 1
+            idx = (viirs_tbl.ulmo_pp_file == ifile) & (viirs_tbl.ulmo_pp_type == ppt)
+            pp_idx = viirs_tbl[idx].ulmo_pp_idx.values
+            viirs_tbl.loc[idx, 'DT39'] = DT40s[pp_idx]
+        f.close()
+
+    # Save the table
+    assert cat_utils.vet_main_table(viirs_tbl, cut_prefix='ulmo_')
+    if not debug:
+        ulmo_io.write_main_table(viirs_tbl, opt.nenya_tbl_file)
+    
+
+def evaluate(opt_path, debug=False, clobber=False, 
+             preproc:str='_std'):
     """
     This function is used to obtain the latents of the trained model
     for all of VIIRS
@@ -67,14 +115,6 @@ def evaluate(opt_path, debug=False, clobber=False, preproc:str='_std'):
             pp_files.append(f's3://viirs/{ifile}')
 
 
-    # Table
-    viirs_tbl = ulmo_io.load_main_table(opt.orig_tbl_file)
-    viirs_tbl.rename(columns={'pp_type':'ulmo_pp_type',
-                              'pp_idx':'ulmo_pp_idx', 
-                              'pp_file':'ulmo_pp_file'}, 
-                     inplace=True)
-
-
     for ifile in pp_files:
         print(f"Working on {ifile}")
         data_file = os.path.basename(ifile)
@@ -92,28 +132,6 @@ def evaluate(opt_path, debug=False, clobber=False, preproc:str='_std'):
             ulmo_io.download_file_from_s3(data_file, ifile)
         else:
             print(f"Data file already downloaded: {data_file}")
-
-        '''
-        # T40
-        print("Calculating DT40") 
-        f = h5py.File(data_file, 'r')
-        for itype in ['valid', 'train']:
-            if itype not in f.keys():
-                continue
-            #
-            print(f"Working on {itype}")
-            embed(header='110 of viirs')
-            images = f[itype][:]
-            DT40s = analyze_image.calc_DT(images, opt.random_jitter)
-            # Fill
-            ppt = 0 if itype == 'valid' else 1
-            idx = (viirs_tbl.ulmo_pp_file == ifile) & (viirs_tbl.ulmo_pp_type == ppt)
-            pp_idx = viirs_tbl[idx].ulmo_pp_idx.values
-            viirs_tbl.loc[idx, 'DT40'] = DT40s[pp_idx]
-        f.close()
-
-        embed(header='114 of viirs')
-        '''
 
         # Extract
         print("Extracting latents")
@@ -134,11 +152,6 @@ def evaluate(opt_path, debug=False, clobber=False, preproc:str='_std'):
             os.remove(data_file)
             print(f'{data_file} removed')
 
-    # Save the table
-    assert cat_utils.vet_main_table(viirs_tbl, cut_prefix='ulmo_')
-    if not debug:
-        ulmo_io.write_main_table(viirs_tbl, opt.nenya_tbl_file)
-    
 
 def umap_me(opt_path:str, debug=False, local=True, 
             metric:str='DT'):
@@ -285,6 +298,13 @@ if __name__ == "__main__":
         train(args.opt_path, debug=args.debug)
         print("Training Ends.")
         # python -u nenya_viirs.py train --opt_path opts_viirs_v1.json 
+
+    # Prep Nenya Table
+    if args.func_flag == 'prep_table':
+        print("Prep Starts.")
+        prep_nenya_table((args.opt_path, debug=args.debug)
+        print("Prep Ends.")
+        # python -u nenya_viirs.py prep_table --opt_path opts_viirs_v1.json 
 
     # Evaluate
     if args.func_flag == 'evaluate':

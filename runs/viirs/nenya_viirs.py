@@ -302,7 +302,7 @@ if __name__ == "__main__":
     # Prep Nenya Table
     if args.func_flag == 'prep_table':
         print("Prep Starts.")
-        prep_nenya_table((args.opt_path, debug=args.debug)
+        prep_nenya_table(args.opt_path, debug=args.debug)
         print("Prep Ends.")
         # python -u nenya_viirs.py prep_table --opt_path opts_viirs_v1.json 
 

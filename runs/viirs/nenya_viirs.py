@@ -88,6 +88,11 @@ def prep_nenya_table(opt_path:str, debug=False):
             viirs_tbl.loc[idx, 'DT39'] = DT40s[pp_idx]
         f.close()
 
+        # Remove data file
+        if not debug:
+            os.remove(data_file)
+            print(f'{data_file} removed')
+
     # Save the table
     assert cat_utils.vet_main_table(viirs_tbl, cut_prefix='ulmo_')
     if not debug:

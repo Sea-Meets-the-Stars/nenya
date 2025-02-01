@@ -65,6 +65,12 @@ def prep_nenya_table(opt_path:str, debug=False):
         print(f"Working on {ifile}")
         data_file = os.path.basename(ifile)
 
+        # Download
+        if not os.path.isfile(data_file):
+            ulmo_io.download_file_from_s3(data_file, ifile)
+        else:
+            print(f"Data file already downloaded: {data_file}")
+
         # T40
         print("Calculating DT40") 
         f = h5py.File(data_file, 'r')

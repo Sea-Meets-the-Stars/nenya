@@ -87,7 +87,6 @@ def prep_nenya_table(opt_path:str, debug=False):
             #
             print(f"Working on {itype}")
             images = f[itype][:]
-            embed(header='90 of nenya')
             DT40s = analyze_image.calc_DT(
                 images, opt.random_jitter, 
                 verbose=True)
@@ -96,6 +95,7 @@ def prep_nenya_table(opt_path:str, debug=False):
             idx = (viirs_tbl.ulmo_pp_file == ifile) & (viirs_tbl.ulmo_pp_type == ppt)
             pp_idx = viirs_tbl[idx].ulmo_pp_idx.values
             viirs_tbl.loc[idx, 'DT40'] = DT40s[pp_idx]
+            embed(header='98 of nenya')
         f.close()
 
         # Remove data file

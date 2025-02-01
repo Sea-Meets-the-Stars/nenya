@@ -98,7 +98,6 @@ def calc_DT(images, random_jitter:list,
     # Calculate T90, T10
     if verbose:
         print("Calculating T90")
-    embed(header='calc_DT: about to calculate T90')
     T_90 = np.percentile(fields[..., xcen-dx:xcen+dx,
         ycen-dy:ycen+dy], 90., axis=(1,2))
     if verbose:

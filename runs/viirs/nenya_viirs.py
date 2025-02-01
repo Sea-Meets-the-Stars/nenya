@@ -68,8 +68,7 @@ def prep_nenya_table(opt_path:str, debug=False):
                               'pp_file':'ulmo_pp_file'}, 
                      inplace=True)
 
-    #for ifile in pp_files:
-    for ifile in pp_files[0:2]:
+    for ifile in pp_files:
         print(f"Working on {ifile}")
         data_file = os.path.basename(ifile)
 

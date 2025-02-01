@@ -93,6 +93,7 @@ def evaluate(opt_path, debug=False, clobber=False, preproc:str='_std'):
         else:
             print(f"Data file already downloaded: {data_file}")
 
+        '''
         # T40
         print("Calculating DT40") 
         f = h5py.File(data_file, 'r')
@@ -112,6 +113,7 @@ def evaluate(opt_path, debug=False, clobber=False, preproc:str='_std'):
         f.close()
 
         embed(header='114 of viirs')
+        '''
 
         # Extract
         print("Extracting latents")

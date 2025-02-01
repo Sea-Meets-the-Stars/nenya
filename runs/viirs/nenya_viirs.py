@@ -69,6 +69,7 @@ def evaluate(opt_path, debug=False, clobber=False, preproc:str='_std'):
 
     # Table
     viirs_tbl = ulmo_io.load_main_table(opt.orig_tbl_file)
+    viirs_tbl.rename(columns={'pp_type':'ulmo_pp_type'}, inplace=True)
 
 
     for ifile in pp_files:
@@ -91,9 +92,17 @@ def evaluate(opt_path, debug=False, clobber=False, preproc:str='_std'):
 
         # T40
         f = h5py.File(data_file, 'r')
-        images = f['valid'][:]
-        DT40s = analyze_image.calc_DT(images, opt.random_jitter)
-        viirs_tbl.loc[idx, 'DT40'] = DT_40[pp_idx]
+        for itype in ['valid', 'train']:
+            if itype not in f.keys():
+                continue
+            #
+            print(f"Working on {itype}")
+            images = f[itype][:]
+            DT40s = analyze_image.calc_DT(images, opt.random_jitter)
+            # Fill
+            ppt = 0 if itype == 'valid' else 1
+            idx = (viirs_tbl.pp_file == pfile) & (viirs_tbl.ulmo_pp_type == ppt)
+            pp_idx = viirs_tbl[idx].ulmo_pp_idx.values
 
         if 'train' in f.keys():
             DT40(f, modis_tbl, pfile, itype='train', verbose=debug)

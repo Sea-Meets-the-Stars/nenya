@@ -149,9 +149,9 @@ def umap_subset(tbl:pandas.DataFrame,
     '''
     # Load main table
     table='CF' if CF else '96'
+    '''
     tbl['US0'] = 0.
     tbl['US1'] = 0.
-    '''
 
     # Cut down on DT
     if DT_cut is not None:

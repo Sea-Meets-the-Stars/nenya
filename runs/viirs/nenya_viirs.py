@@ -221,8 +221,6 @@ def umap_me(opt_path:str, debug=False, local=True,
             umap_savefile = outfile.replace('Tables','UMAP')
             umap_savefile = umap_savefile.replace('.parquet','_UMAP.pkl')
 
-        embed(header='224 of nenya_viirs')
-
         DT_cut = None 
         alpha_cut = None 
         if 'DT' in metric:
@@ -328,7 +326,7 @@ if __name__ == "__main__":
     # python ssl_modis_v4.py --func_flag umap --debug --local
     if args.func_flag == 'umap':
         umap_me(args.opt_path, debug=args.debug, local=args.local)
-        # python -u nenya_viirs.py umap --opt_path opts_viirs_v1.json  --local
+        # python -u nenya_viirs.py umap --opt_path opts_nenya_viirs_v1.json  --local
 
     '''
     # python ssl_modis_v4.py --func_flag revert_mask --debug

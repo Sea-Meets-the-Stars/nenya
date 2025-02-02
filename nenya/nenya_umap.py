@@ -209,7 +209,7 @@ def umap_subset(tbl:pandas.DataFrame,
         basefile = os.path.basename(latents_file)
 
         pfile = basefile.replace('_latents', '_preproc')
-        yidx = tbl.pp_file == f'{opt.s3_bucket}PreProc/{pfile}'
+        yidx = tbl.ulmo_pp_file == f'{opt.s3_bucket}PreProc/{pfile}'
 
         if debug:
             embed(header='223 of umap')

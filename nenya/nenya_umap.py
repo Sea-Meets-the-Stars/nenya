@@ -188,7 +188,7 @@ def umap_subset(tbl:pandas.DataFrame,
     if local:
         latents_path = os.path.join(
             os.getenv('OS_SST'), opt.sensor, 'Nenya', opt.latents_folder)
-        latent_files = glob.glob(latents_path)
+        latent_files = glob.glob(latents_path+'/*.h5')
     else:
         latents_path = os.path.join(opt.s3_outdir, opt.latents_folder)
         latent_files = ulmo_io.list_of_bucket_files(latents_path)
@@ -199,9 +199,6 @@ def umap_subset(tbl:pandas.DataFrame,
     # Loop on em all
     if debug:
         latent_files = latent_files[0:2]
-
-    if debug:
-        embed(header='178 of umap')
 
     all_latents = []
     sv_idx = []

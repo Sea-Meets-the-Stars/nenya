@@ -229,7 +229,7 @@ def umap_subset(tbl:pandas.DataFrame,
         all_latents_valid = hf['valid'][:]
 
         valid_idx = valid & yidx
-        pp_idx = tbl[valid_idx].pp_idx.values
+        pp_idx = tbl[valid_idx].ulmo_pp_idx.values
 
         # Grab and save
         gd_latents = all_latents_valid[pp_idx, :]
@@ -239,7 +239,7 @@ def umap_subset(tbl:pandas.DataFrame,
         # Train
         train_idx = train & yidx
         if 'train' in hf.keys() and (np.sum(train_idx) > 0):
-            pp_idx = tbl[train_idx].pp_idx.values
+            pp_idx = tbl[train_idx].ulmo_pp_idx.values
             all_latents_train = hf['train'][:]
             gd_latents = all_latents_train[pp_idx, :]
             all_latents.append(gd_latents)

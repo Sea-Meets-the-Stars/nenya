@@ -174,7 +174,7 @@ def evaluate(opt_path, debug=False, clobber=False,
             print(f'{data_file} removed')
 
 
-def umap_me(opt_path:str, debug=False, local=True, 
+def umap_me(opt_path:str, debug=False, local=True,
             metric:str='DT'):
     """Run a UMAP analysis on all the VIIRS L2 data
     v5 model
@@ -193,21 +193,10 @@ def umap_me(opt_path:str, debug=False, local=True,
     opt = params.Params(opt_path)
     params.option_preprocess(opt)
 
-    # Load v5 Table
-    if local:
-        tbl_file = os.path.join(os.getenv('OS_SST'),
-                                'VIIRS', 'Tables', 
-                                os.path.basename(opt.tbl_file))
-    else:                            
-        tbl_file = opt.tbl_file
-    viirs_tbl = ulmo_io.load_main_table(tbl_file)
-
-    # Add slope
-    #viirs_tbl['min_slope'] = np.minimum(
-    #    viirs_tbl.zonal_slope, viirs_tbl.merid_slope)
+    # Load Table
+    viirs_tbl = ulmo_io.load_main_table(opt.nenya_tbl_file)
 
     # Base
-    base1 = 'viirs_v1'
 
     if 'DT' in metric: 
         subsets =  ['DT15', 'DT0', 'DT1', 'DT2', 'DT4', 'DT5', 'DTall']
@@ -218,20 +207,20 @@ def umap_me(opt_path:str, debug=False, local=True,
         if debug:
             subsets = ['a0']
     else:
-        raise ValueError("Bad metric")
+        raise ValueError(f"Bad metric: {metric}")
 
     # Loop me
     for subset in subsets:
         # Files
         outfile = os.path.join(
             os.getenv('OS_SST'), 
-            f'VIIRS/Nenya/Tables/VIIRS_Nenya_{base1}_{subset}.parquet')
+            f'VIIRS/Nenya/Tables/VIIRS_Nenya_{opt.model_root}_{subset}.parquet')
         if debug:
             umap_savefile = 'umap_test.pkl'
         else:
             umap_savefile = os.path.join(
                 os.getenv('OS_SST'), 
-                f'VIIRS/Nenya/UMAP/VIIRS_Nenya_{base1}_{subset}_UMAP.pkl')
+                f'VIIRS/Nenya/UMAP/VIIRS_Nenya_{opt.model_root}_{subset}_UMAP.pkl')
 
         DT_cut = None 
         alpha_cut = None 

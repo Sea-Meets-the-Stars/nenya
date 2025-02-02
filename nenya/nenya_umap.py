@@ -141,13 +141,14 @@ def umap_subset(tbl:pandas.DataFrame,
         IOError: _description_
         IOError: _description_
     """
-
     opt = params.option_preprocess(params.Params(opt_path))
 
+    '''
     # Load main table
     table='CF' if CF else '96'
     tbl['US0'] = 0.
     tbl['US1'] = 0.
+    '''
 
     # Cut down on DT
     if DT_cut is not None:
@@ -170,15 +171,14 @@ def umap_subset(tbl:pandas.DataFrame,
     tbl = tbl[keep].copy()
     print(f"After the cuts, we have {len(tbl)} cutouts to work on.")
 
-    # 
-    if table in ['CF', '96']:
-        valid = tbl.ulmo_pp_type == 0
-        train = tbl.ulmo_pp_type == 1
-        cut_prefix = 'ulmo_'
-    else:
-        raise IOError("Need to deal with this")
+    # Ulmo pp_type
+    valid = tbl.ulmo_pp_type == 0
+    train = tbl.ulmo_pp_type == 1
+    cut_prefix = 'ulmo_'
 
     # Prep latent_files
+    if local:
+        embed(header='181 of umap')
     print(f"Loading latents from this folder: {opt.latents_folder}")
     latents_path = os.path.join(opt.s3_outdir, opt.latents_folder)
     latent_files = ulmo_io.list_of_bucket_files(latents_path)

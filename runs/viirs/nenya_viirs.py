@@ -175,7 +175,7 @@ def evaluate(opt_path, debug=False, clobber=False,
 
 
 def umap_me(opt_path:str, debug=False, local=True,
-            metric:str='DT'):
+            metric:str='DT', clear_fraction:float=0.98):
     """Run a UMAP analysis on all the VIIRS L2 data
     v5 model
 
@@ -214,13 +214,14 @@ def umap_me(opt_path:str, debug=False, local=True,
         # Files
         outfile = os.path.join(
             os.getenv('OS_SST'), 
-            f'VIIRS/Nenya/Tables/VIIRS_Nenya_{opt.model_root}_{subset}.parquet')
+            f'VIIRS/Nenya/Tables/VIIRS_Nenya_{opt.model_root}_{int(clear_fraction*100)}clear_{subset}.parquet')
         if debug:
             umap_savefile = 'umap_test.pkl'
         else:
-            umap_savefile = os.path.join(
-                os.getenv('OS_SST'), 
-                f'VIIRS/Nenya/UMAP/VIIRS_Nenya_{opt.model_root}_{subset}_UMAP.pkl')
+            umap_savefile = outfile.replace('Tables','UMAP')
+            umap_savefile = umap_savefile.replace('.parquet','_UMAP.pkl')
+
+        embed(header='224 of nenya_viirs')
 
         DT_cut = None 
         alpha_cut = None 
@@ -254,6 +255,7 @@ def umap_me(opt_path:str, debug=False, local=True,
                              DT_key='DT',
                              alpha_cut=alpha_cut, 
                              debug=debug, 
+                             max_cloud_fraction=1.-clear_fraction,
                              train_umap=train_umap, 
                              umap_savefile=umap_savefile,
                              remove=False, CF=False)

@@ -23,6 +23,7 @@
     "valid_key": "valid",
     "orig_tbl_file": "s3://viirs/Tables/VIIRS_all_95clear_std.parquet",
     "nenya_tbl_file": "s3://viirs/Nenya/Tables/VIIRS_Nenya_v1.parquet",
+    "s3_bucket": "s3://viirs/",
     "s3_outdir": "s3://viirs/Nenya/",
     "local_outdir": "s3://viirs/Nenya/",
     "temp": 0.07,

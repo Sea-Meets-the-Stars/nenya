@@ -1,6 +1,7 @@
 """ UMAP utitlies for Nenya """
 import numpy as np
 import os, shutil
+import glob
 import pickle
 
 import h5py
@@ -115,6 +116,7 @@ def umap_subset(tbl:pandas.DataFrame,
                 opt_path:str, outfile:str, 
                 DT_cut:str=None, 
                 alpha_cut:str=None, 
+                max_cloud_fraction:float=None,
                 ntrain=200000, remove=True,
                 DT_key:str='DT40',
                 umap_savefile:str=None,
@@ -141,7 +143,8 @@ def umap_subset(tbl:pandas.DataFrame,
         IOError: _description_
         IOError: _description_
     """
-    opt = params.option_preprocess(params.Params(opt_path))
+    opt = params.Params(opt_path)
+    params.option_preprocess(opt)
 
     '''
     # Load main table
@@ -160,6 +163,10 @@ def umap_subset(tbl:pandas.DataFrame,
     else: # Do em all! (or cut on alpha)
         keep = np.ones(len(tbl), dtype=bool)
 
+    # Cut down on clouds?
+    if max_cloud_fraction is not None:
+        keep = keep & (tbl.clear_fraction < max_cloud_fraction)
+
     # Cut down on alpha
     if DT_cut is None and alpha_cut is not None:
         alpha_cuts = defs.umap_alpha[alpha_cut]
@@ -177,12 +184,15 @@ def umap_subset(tbl:pandas.DataFrame,
     cut_prefix = 'ulmo_'
 
     # Prep latent_files
-    if local:
-        embed(header='181 of umap')
     print(f"Loading latents from this folder: {opt.latents_folder}")
-    latents_path = os.path.join(opt.s3_outdir, opt.latents_folder)
-    latent_files = ulmo_io.list_of_bucket_files(latents_path)
-    latent_files = ['s3://modis-l2/'+item for item in latent_files]
+    if local:
+        latents_path = os.path.join(
+            os.getenv('OS_SST'), opt.sensor, 'Nenya', opt.latents_folder)
+        latent_files = glob.glob(latents_path)
+    else:
+        latents_path = os.path.join(opt.s3_outdir, opt.latents_folder)
+        latent_files = ulmo_io.list_of_bucket_files(latents_path)
+        latent_files = [opt.s3_bucket+item for item in latent_files]
 
     # Load up all the latent vectors
 
@@ -197,17 +207,18 @@ def umap_subset(tbl:pandas.DataFrame,
     sv_idx = []
     for latents_file in latent_files:
         basefile = os.path.basename(latents_file)
-        year = int(basefile[12:16])
+
+        pfile = basefile.replace('_latents', '_preproc')
+        yidx = tbl.pp_file == f'{opt.s3_bucket}PreProc/{pfile}'
+
+        if debug:
+            embed(header='223 of umap')
 
         # Download?
         if not os.path.isfile(basefile):
             # Try local if local is True
             if local:
-                local_file = latents_file.replace('s3://modis-l2/SSL', # yes, SSL as these are the latest
-                    os.path.join(os.getenv('OS_SST'),
-                                                  'MODIS_L2', 'Nenya'))
-                print(f"Copying {local_file}")
-                shutil.copyfile(local_file, basefile)
+                shutil.copyfile(latents_file, basefile)
             if not os.path.isfile(basefile):
                 print(f"Downloading {latents_file} (this is *much* faster than s3 access)...")
                 ulmo_io.download_file_from_s3(basefile, latents_file)
@@ -219,7 +230,7 @@ def umap_subset(tbl:pandas.DataFrame,
         # ##############33
         # Valid
         all_latents_valid = hf['valid'][:]
-        yidx = tbl.pp_file == f's3://modis-l2/PreProc/MODIS_R2019_{year}_95clear_128x128_preproc_std.h5'
+
         valid_idx = valid & yidx
         pp_idx = tbl[valid_idx].pp_idx.values
 

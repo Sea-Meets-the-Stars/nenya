@@ -58,7 +58,7 @@ if __name__ == '__main__':
     #pca_latents('MODIS_SST')
 
     #  VIIRS SST
-    #pca_latents('VIIRS_SST')
+    pca_latents('VIIRS_SST')
 
     #  LLC SST
-    pca_latents('LLC_SST')
+    #pca_latents('LLC_SST')

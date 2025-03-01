@@ -9,6 +9,9 @@ __pycache__/
 # IDE
 .vscode/
 
+# Data
+*.npz
+
 # Distribution / packaging
 .Python
 build/

@@ -15,8 +15,7 @@ import matplotlib.gridspec as gridspec
 
 import seaborn as sns
 
-from oceancolor.hydrolight import loisel23
-from oceancolor.utils import plotting 
+from remote_sensing.plotting import utils as rsp_utils
 
 mpl.rcParams['font.family'] = 'stixgeneral'
 
@@ -78,7 +77,7 @@ def fig_pca(outfile:str='fig_pca_variance.png'):
     # Turn on grid
     ax.grid(True, which='both', ls='--', lw=0.5)
 
-    plotting.set_fontsize(ax, 18)
+    rsp_utils.set_fontsize(ax, 18)
 
     plt.tight_layout()#pad=0.0, h_pad=0.0, w_pad=0.3)
     plt.savefig(outfile, dpi=300)
@@ -91,7 +90,7 @@ def main(flg):
         flg= int(flg)
 
     # PCA variaince
-    if flg & (2**19):
+    if flg == 1:
         fig_pca()
 
 # Command line execution
@@ -100,9 +99,6 @@ if __name__ == '__main__':
 
     if len(sys.argv) == 1:
         flg = 0
-
-        flg += 2 ** 19  # PCA veriance
-        
     else:
         flg = sys.argv[1]
 

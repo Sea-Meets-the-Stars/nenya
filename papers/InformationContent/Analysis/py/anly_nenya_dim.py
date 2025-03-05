@@ -55,10 +55,10 @@ def pca_latents(dataset:str):
 # Command line execution
 if __name__ == '__main__':
     # PCA MODIS SST
-    #pca_latents('MODIS_SST')
+    pca_latents('MODIS_SST')
 
     #  VIIRS SST
     pca_latents('VIIRS_SST')
 
     #  LLC SST
-    #pca_latents('LLC_SST')
+    pca_latents('LLC_SST')

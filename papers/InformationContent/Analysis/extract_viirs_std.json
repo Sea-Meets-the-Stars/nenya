@@ -8,6 +8,7 @@
         34
     ],
     "clear_threshold": 95,
+    "grow_mask": 1.5,
     "inpaint": true,
     "only_inpaint": true
 }

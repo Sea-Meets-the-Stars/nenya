@@ -26,6 +26,7 @@ setup_keywords['install_requires'] = [
     'scikit-learn', 'scikit-image', 'tqdm', 'astropy', 'astropy-healpix',
     'healpy', 'cftime', 'bokeh', 'umap-learn', 'llvmlite', 'boto3',
     'xarray', 'h5netcdf', 
+    'setuptools-scm', # for versioning
     'importlib-metadata', 'timm==0.3.2']
 setup_keywords['zip_safe'] = False
 setup_keywords['use_2to3'] = False

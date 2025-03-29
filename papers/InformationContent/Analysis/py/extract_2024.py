@@ -23,5 +23,5 @@ if __name__ == '__main__':
     # VIIRS
     extract_viirs('VIIRS_N21', 'extract_viirs_std.json', 
                   'ex_VIIRS_N21_2024.h5', 'VIIRS_N21_2024.parquet',
-                  n_cores=15, debug=True)#, debug_async=True, debug=True)
+                  n_cores=15)#, debug=True)#, debug_async=True, debug=True)
                   #n_cores=15, debug=True)

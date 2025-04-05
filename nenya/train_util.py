@@ -107,12 +107,25 @@ class RandomFlip:
 class JitterCrop:
     """
     Random Jitter and Crop augmentaion of the training samples.
+
+    Args:
+        crop_dim (int): Crop dimension
+            Size of the crop
+        jitter_lim (int): Jitter limit
+        rescale (int): Rescale factor
+            Note: this is not implemented yet
+        verbose (bool): Verbose flag
     """
-    def __init__(self, crop_dim=32, rescale=2, jitter_lim=0, verbose=False):
-        self.crop_dim = crop_dim
-        self.offset = self.crop_dim//2
+    def __init__(self, crop_dim=32, rescale:int=0, jitter_lim=0, verbose=False):
         self.jitter_lim = jitter_lim
+        self.crop_dim = crop_dim
+
+        # Half-size of the final image
+        self.offset = self.crop_dim//2
+        # Rescale
         self.rescale = rescale
+        if self.rescale > 0:
+            raise IOError("Rescale not implemented yet")
         self.verbose = verbose
         
     def __call__(self, image):
@@ -154,6 +167,8 @@ class JitterCrop:
 class RandomJitterCrop:
     """
     Random Jitter and Crop Augmentation used in v2 
+
+    DEPRECATED
     """
     def __init__(self, crop_lim=5, jitter_lim=5):
         self.crop_lim = crop_lim
@@ -163,6 +178,7 @@ class RandomJitterCrop:
         offset_left, offset_right = 0, 0
         offset_low, offset_high = 0, 0
         
+        # Random realization
         rand_crop_x = int(np.random.randint(0, self.crop_lim+1, 1))
         rand_crop_y = int(np.random.randint(0, self.crop_lim+1, 1))
         jitter_lim_x = min(rand_crop_x//2, self.jitter_lim)
@@ -170,6 +186,7 @@ class RandomJitterCrop:
         rand_jitter_x = int(np.random.randint(-jitter_lim_x, jitter_lim_x+1))
         rand_jitter_y = int(np.random.randint(-jitter_lim_y, jitter_lim_y+1))
         
+        # Crop in x
         if rand_crop_x > 0:
             offset_left = rand_crop_x // 2
             offset_right = rand_crop_x - offset_left
@@ -177,6 +194,7 @@ class RandomJitterCrop:
                 offset_left -= rand_jitter_x
                 offset_right += rand_jitter_x
                 
+        # Crop in y
         if rand_crop_y > 0:
             offset_low = rand_crop_y // 2
             offset_high = rand_crop_y - offset_low
@@ -192,10 +210,12 @@ class RandomJitterCrop:
         #assert (offset_low >= 0) and (offset_left >= 0), "Crop is Wrong!"
         #assert (offset_high >= 0) and (offset_right >= 0), "Crop is Wrong!"
 
+        # Crop
         image_cropped = image[offset_left: image_width-offset_right, offset_low: image_height-offset_high]
         image = skimage.transform.resize(image_cropped, image.shape)
         image = np.repeat(image, 3, axis=-1)
         
+        # Return
         return image
     
 class GaussianNoise:
@@ -268,11 +288,11 @@ def nenya_loader(opt, valid=False):
         augment_list.append(RandomFlip())
     if opt.rotate:
         augment_list.append(RandomRotate())
-    if opt.random_jitter == 0:
+    if opt.random_cropjitter == 0:
         augment_list.append(JitterCrop())
     else:
-        augment_list.append(JitterCrop(crop_dim=opt.random_jitter[0],
-                                       jitter_lim=opt.random_jitter[1],
+        augment_list.append(JitterCrop(crop_dim=opt.random_cropjitter[0],
+                                       jitter_lim=opt.random_cropjitter[1],
                                        rescale=0))
     if opt.demean:
         augment_list.append(Demean())
@@ -285,10 +305,6 @@ def nenya_loader(opt, valid=False):
 
     # Do it
     transforms_compose = transforms.Compose(augment_list)
-        #[RandomRotate(),
-        #                                     JitterCrop(),
-        #                                     GaussianNoise(),
-        #                                     transforms.ToTensor()])
 
     if not valid:
         data_key = opt.train_key

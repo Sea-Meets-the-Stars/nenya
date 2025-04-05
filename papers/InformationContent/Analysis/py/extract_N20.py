@@ -10,6 +10,9 @@ def extract_viirs_n20(tstart, tend,
                   ex_file:str, tbl_file:str, n_cores:int=15,
                   debug=False):
 
+    #if debug:
+    #    tstart = '2022-02-28T00:00:00'
+
     gg_run(dataset, tstart, tend, eoption_file, 
                        ex_file, tbl_file, n_cores, 
                        verbose=True, debug=debug, 
@@ -20,9 +23,11 @@ def extract_viirs_n20(tstart, tend,
 if __name__ == '__main__':
 
     # One year at a time
-    for year in range(2020, 2025):
+    #for year in range(2020, 2025):
+    for year in range(2022, 2025):
         tstart = f'{year}-01-01T00:00:00'
         tend = f'{year}-12-31T23:59:59'
+
 
         # VIIRS
         extract_viirs_n20(tstart, tend, 'VIIRS_N20', 'extract_viirs_std.json', 

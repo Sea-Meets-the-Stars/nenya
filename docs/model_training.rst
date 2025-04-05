@@ -19,7 +19,7 @@ The main training loop is implemented in ``train.py``:
 
 The training function handles:
 
-1. Loading and preprocessing options
+1. Loading and augmentation options
 2. Building the model and criterion (loss function)
 3. Setting up the optimizer
 4. Training for the specified number of epochs
@@ -29,7 +29,9 @@ The training function handles:
 Model Architecture
 ---------------
 
-The default model architecture is based on ResNet with a customized projection head for contrastive learning:
+The default model architecture is based on ResNet with a customized 
+projection head for contrastive learning.  The model is set with
+the `set_model()` method in ``train_util.py``:
 
 .. code-block:: python
 
@@ -38,7 +40,8 @@ The default model architecture is based on ResNet with a customized projection h
    # Create a model with a specific backbone and feature dimension
    model = SupConResNet(name='resnet50', feat_dim=128)
 
-Nenya supports several ResNet variants ('resnet18', 'resnet34', 'resnet50', etc.) which can be specified in the options file.
+Nenya supports several ResNet variants ('resnet18', 'resnet34', 'resnet50', etc.) 
+which can be specified in the options file.
 
 Loss Function
 -----------
@@ -74,23 +77,27 @@ Key training options include:
 .. code-block:: javascript
 
    {
-     "ssl_method": "SimCLR",     // Training method (SimCLR or SupCon)
-     "ssl_model": "resnet50",    // Backbone model
-     "learning_rate": 0.05,      // Initial learning rate
-     "batch_size_train": 64,     // Batch size for training
-     "batch_size_valid": 64,     // Batch size for validation
-     "epochs": 200,              // Number of epochs
-     "feat_dim": 128,            // Feature dimension size
-     "temp": 0.07,               // Temperature parameter for loss
-     "weight_decay": 1e-4,       // Weight decay for optimizer
-     "momentum": 0.9,            // Momentum for optimizer
-     "cosine": true,             // Use cosine learning rate schedule
-     "random_jitter": [5, 5],    // Jitter parameters for augmentation
-     "model_root": "models/v5",  // Root directory for model output
-     "train_key": "train",       // Dataset key for training
-     "valid_key": "valid",       // Dataset key for validation
-     "save_freq": 10,            // Save checkpoint every N epochs
-     "valid_freq": 5             // Validate every N epochs
+     "ssl_method": "SimCLR",      // Training method (SimCLR or SupCon)
+     "ssl_model": "resnet50",     // Backbone model
+     "learning_rate": 0.05,       // Initial learning rate
+     "batch_size_train": 64,      // Batch size for training
+     "batch_size_valid": 64,      // Batch size for validation
+     "epochs": 200,               // Number of epochs
+     "feat_dim": 128,             // Feature dimension size
+     "temp": 0.07,                // Temperature parameter for loss
+     "weight_decay": 1e-4,        // Weight decay for optimizer
+     "momentum": 0.9,             // Momentum for optimizer
+     "cosine": true,              // Use cosine learning rate schedule
+     "random_cropjitter": [40, 5],// Crop and Jitter (random) parameters for augmentation
+     "rotate": true,              // Apply random rotation
+     "flip": true,                // Apply random horizontal/vertical flip
+     "demean": true,              // Apply mean normalization after crop
+     "gauss_noise": 0.,           // Apply Gaussian noise; 0 = None
+     "model_root": "models/v5",   // Root directory for model output
+     "train_key": "train",        // Dataset key for training
+     "valid_key": "valid",        // Dataset key for validation
+     "save_freq": 10,             // Save checkpoint every N epochs
+     "valid_freq": 5              // Validate every N epochs
    }
 
 Data Loaders

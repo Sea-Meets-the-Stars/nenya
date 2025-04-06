@@ -76,6 +76,7 @@ def prep_for_training(tbl_file:str,
     # Save the training and validation data
     if not debug:
         # Load h5
+        print("Working on the fields..")
         fields = f['fields'][:]
         sub_fields = np.zeros((n_train+n_valid, fields.shape[1], fields.shape[2]), 
                               dtype=np.float32)
@@ -83,21 +84,22 @@ def prep_for_training(tbl_file:str,
             sub_fields[kk] = fields[idx]
         del fields
 
-        inpainted = f['inpainted_masks'][:]
-
         # Inpaint
+        print("Inpainting..")
+        inpainted = f['inpainted_masks'][:]
         for kk, idx in enumerate(idx_tv):
             fill = np.isfinite(inpainted[idx])
-            fields[kk][fill] = inpainted[idx][fill]
-
+            sub_fields[kk][fill] = inpainted[idx][fill]
         del inpainted
 
         # Write
-        train_f.create_dataset('train', data=fields[:n_train])
-        train_f.create_dataset('valid', data=fields[n_train:])
+        print("Writing..")
+        train_f.create_dataset('train', data=sub_fields[:n_train])
+        train_f.create_dataset('valid', data=sub_fields[n_train:])
         train_f.close()
 
         # Push to s3
+        print("Uploading..")
         wr_io.upload_file_to_s3(base_preproc, preproc_file)
 
         # Table

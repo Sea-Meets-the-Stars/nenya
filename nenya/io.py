@@ -1,6 +1,7 @@
 """ I/O routines for SSL analysis """
 import os
 from importlib import resources
+from io import BytesIO
 
 import pandas
 

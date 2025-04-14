@@ -264,7 +264,12 @@ class NenyaDataset(Dataset):
 
     def __getitem__(self, global_idx):     
         self._open_file()
+        # This may have shape [1, npix, npix]
         image = self.files[self.data_key][global_idx]
+        # Build out
+        if image.ndim == 2:
+            image = np.expand_dims(image, axis=0)
+        # Process
         image_transposed = np.transpose(image, (1, 2, 0))
         image_transformed = self.transform(image_transposed)
         

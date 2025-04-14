@@ -79,15 +79,21 @@ Key training options include:
    {
      "ssl_method": "SimCLR",      // Training method (SimCLR or SupCon)
      "ssl_model": "resnet50",     // Backbone model
+     "num_workers": 16,         // Number of workers for data loading
+     "epochs": 50,            // Number of epochs for training
      "learning_rate": 0.05,       // Initial learning rate
+     "lr_decay_epochs": "700, 800, 900", // Epochs for learning rate decay
+     "lr_decay_rate": 0.1,      // Learning rate decay factor
      "batch_size_train": 64,      // Batch size for training
      "batch_size_valid": 64,      // Batch size for validation
      "epochs": 200,               // Number of epochs
      "feat_dim": 128,             // Feature dimension size
      "temp": 0.07,                // Temperature parameter for loss
+     "warm": true,                // Use warmup for learning rate
      "weight_decay": 1e-4,        // Weight decay for optimizer
      "momentum": 0.9,             // Momentum for optimizer
      "cosine": true,              // Use cosine learning rate schedule
+     "images_file": "train_VIIRS_N21_2024.h5", // Name of the training data file
      "random_cropjitter": [40, 5],// Crop and Jitter (random) parameters for augmentation
      "rotate": true,              // Apply random rotation
      "flip": true,                // Apply random horizontal/vertical flip

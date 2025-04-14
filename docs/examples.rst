@@ -96,7 +96,7 @@ This example shows how to visualize the UMAP space and explore patterns:
    plt.show()
 
 Training a New Model
-------------------
+--------------------
 
 This example shows how to train a new Nenya model:
 
@@ -136,7 +136,6 @@ This example shows how to train a new Nenya model:
    with open("configs/my_model_config.json", "w") as f:
        json.dump(config, f, indent=2)
    
-   # Train the model
    train_main("configs/my_model_config.json", debug=False)
 
 Extracting Latents from a Dataset

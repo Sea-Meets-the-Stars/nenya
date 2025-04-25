@@ -19,6 +19,8 @@ from nenya.losses import SupConLoss
 from nenya.util import TwoCropTransform, AverageMeter
 from nenya.util import warmup_learning_rate
 
+from IPython import embed
+
 class Demean:
     """
     Remove the mean of the image
@@ -303,7 +305,13 @@ def nenya_loader(opt, valid=False):
         augment_list.append(Demean())
 
     # 3-chanel augmentation
-    augment_list.append(ThreeChannel())
+    if opt.nchannels == 3:
+        print("Using 3 channels")
+        augment_list.append(ThreeChannel())
+    elif opt.nchannels == 1:
+        print("Using 1 channel")
+    else:
+        raise IOError(f"Number of channels={opt.nchannels} not supported")
 
     # Tensor
     augment_list.append(transforms.ToTensor())
@@ -320,7 +328,8 @@ def nenya_loader(opt, valid=False):
     data_file = os.path.join(opt.data_folder, opt.images_file)
 
     modis_dataset = NenyaDataset(data_file, 
-                                 transform=TwoCropTransform(transforms_compose), 
+                                 transform=TwoCropTransform(
+                                     transforms_compose), 
                                  data_key=data_key)
     sampler = None                                
     loader = torch.utils.data.DataLoader(
@@ -377,7 +386,9 @@ def set_model(opt, cuda_use=True):
         model: (torch.nn.Module) model class set up by opt.
         criterion: (torch.Tensor) training loss.
     """
-    model = SupConResNet(name=opt.ssl_model, feat_dim=opt.feat_dim)
+    model = SupConResNet(name=opt.ssl_model, 
+                         feat_dim=opt.feat_dim,
+                         nchannels=opt.nchannels)
     criterion = SupConLoss(temperature=opt.temp)
 
     # enable synchronized Batch Normalization
@@ -430,6 +441,7 @@ def train_model(train_loader, model, criterion, optimizer,
 
     for idx, images in enumerate(train_loader):
         data_time.update(time.time() - end)
+        print(f"Data time: {data_time.val:.3f} ({data_time.avg:.3f})")
 
         images = torch.cat([images[0], images[1]], dim=0)
         if torch.cuda.is_available() and cuda_use:

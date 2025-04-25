@@ -38,5 +38,5 @@
     "rotate": true,
     "demean": true,
     "nenya_data": true,
-    "cuda_use": true
+    "cuda_use": false
 }

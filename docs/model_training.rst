@@ -94,6 +94,7 @@ Key training options include:
      "momentum": 0.9,             // Momentum for optimizer
      "cosine": true,              // Use cosine learning rate schedule
      "images_file": "train_VIIRS_N21_2024.h5", // Name of the training data file. Shape: [nimages, npix, npix]
+     "nchannels": 3,              // Number of channels in the input images
      "random_cropjitter": [40, 5],// Crop and Jitter (random) parameters for augmentation
      "rotate": true,              // Apply random rotation
      "flip": true,                // Apply random horizontal/vertical flip

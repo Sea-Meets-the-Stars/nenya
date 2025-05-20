@@ -2,8 +2,8 @@
     "print_freq": 100,
     "save_freq": 1,
     "valid_freq": 1,
-    "batch_size_train": 64,
-    "batch_size_valid": 32, 
+    "batch_size_train": 16,
+    "batch_size_valid": 8, 
     "num_workers": 4,
     "epochs": 5,
     "learning_rate": 0.05,
@@ -38,5 +38,5 @@
     "rotate": true,
     "demean": true,
     "nenya_data": true,
-    "cuda_use": true
+    "cuda_use": false
 }

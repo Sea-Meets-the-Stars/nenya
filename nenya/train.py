@@ -9,6 +9,7 @@ from tqdm.auto import trange
 from nenya import io as nenya_io
 from nenya.train_util import set_model, train_model
 from nenya.train_util import nenya_loader
+from nenya.train_util import save_losses
 from nenya import params 
 from nenya.util import set_optimizer, save_model
 from nenya.util import adjust_learning_rate
@@ -94,26 +95,12 @@ def main(opt_path: str, debug:bool=False):
             save_file = os.path.join(opt.model_folder,
                                      f'ckpt_epoch_{epoch}.pth')
             save_model(model, optimizer, opt, epoch, save_file)
+
+            # Save losses
+            save_losses(opt, loss_train, loss_step_train, loss_avg_train,
+                loss_valid, loss_step_valid, loss_avg_valid)
+            
             
     # save the last model local
     save_file = os.path.join(opt.model_folder, 'last.pth')
     save_model(model, optimizer, opt, opt.epochs, save_file)
-
-    # Save the losses
-    if not os.path.isdir(f'{opt.model_folder}/learning_curve/'):
-        os.mkdir(f'{opt.model_folder}/learning_curve/')
-        
-    losses_file_train = os.path.join(opt.model_folder,'learning_curve',
-                                     f'{opt.model_name}_losses_train.h5')
-    losses_file_valid = os.path.join(opt.model_folder,'learning_curve',
-                                     f'{opt.model_name}_losses_valid.h5')
-    
-    with h5py.File(losses_file_train, 'w') as f:
-        f.create_dataset('loss_train', data=np.array(loss_train))
-        f.create_dataset('loss_step_train', data=np.array(loss_step_train))
-        f.create_dataset('loss_avg_train', data=np.array(loss_avg_train))
-    with h5py.File(losses_file_valid, 'w') as f:
-        f.create_dataset('loss_valid', data=np.array(loss_valid))
-        f.create_dataset('loss_step_valid', data=np.array(loss_step_valid))
-        f.create_dataset('loss_avg_valid', data=np.array(loss_avg_valid))
-        

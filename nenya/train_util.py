@@ -118,7 +118,8 @@ class JitterCrop:
             Note: this is not implemented yet
         verbose (bool): Verbose flag
     """
-    def __init__(self, crop_dim=32, rescale:int=0, jitter_lim=0, verbose=False):
+    def __init__(self, crop_dim=32, rescale:int=0, jitter_lim=0, 
+                 verbose=False):
         self.jitter_lim = jitter_lim
         self.crop_dim = crop_dim
 
@@ -129,6 +130,9 @@ class JitterCrop:
         if self.rescale > 0:
             raise IOError("Rescale not implemented yet")
         self.verbose = verbose
+
+        if self.verbose:
+            print(f'Offset: {self.offset}')
         
     def __call__(self, image):
         """ 
@@ -146,9 +150,19 @@ class JitterCrop:
             center_x += int(np.random.randint(-self.jitter_lim, self.jitter_lim+1, 1))
             center_y += int(np.random.randint(-self.jitter_lim, self.jitter_lim+1, 1))
 
-        image_cropped = image[(center_x-self.offset):(center_x+self.offset), 
-                              (center_y-self.offset):(center_y+self.offset), 
-                              0]
+        row0 = max(center_x - self.offset, 0)
+        row1 = min(center_x + self.offset, image.shape[0])
+        col0 = max(center_y - self.offset, 0)
+        col1 = min(center_y + self.offset, image.shape[1])
+
+        image_cropped = image[row0:row1,col0:col1,:]
+            #(center_x-self.offset):(center_x+self.offset), 
+                              #(center_y-self.offset):(center_y+self.offset), 
+                              #:]
+        if self.verbose:
+            print(f'Shape of image cropped: {image_cropped.shape}')
+            print(f'center_x: {center_x}, center_y: {center_y}')
+
         if self.rescale > 0:
             # THIS WILL PROBABLY BREAK
             #image = skimage.transform.rescale(image_cropped, self.rescale)
@@ -291,6 +305,7 @@ def nenya_loader(opt, valid=False):
     """
     # Construct the Augmentations
     augment_list = []
+    #embed(header='294 of train_util')
     if opt.flip:
         augment_list.append(RandomFlip())
     if opt.rotate:
@@ -300,7 +315,8 @@ def nenya_loader(opt, valid=False):
     else:
         augment_list.append(JitterCrop(crop_dim=opt.random_cropjitter[0],
                                        jitter_lim=opt.random_cropjitter[1],
-                                       rescale=0))
+                                       rescale=0,
+                                       verbose=False))
     if opt.demean:
         augment_list.append(Demean())
 

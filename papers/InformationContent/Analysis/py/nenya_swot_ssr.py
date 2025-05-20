@@ -10,12 +10,25 @@ from nenya.train import main as train_main
 
 # cp ~/Oceanography/python/nenya/papers/InformationContent/Analysis/opts_nenya_swot_test.json .
 
-def main():
+def main(flg):
+
+    flg= int(flg)
 
     # Train the model
-    train_main("opts_nenya_swot_test.json", debug=False)
+    if flg == 1:
+        train_main("opts_nenya_swot_test.json", debug=False)
+    # Main
+    if flg == 2:
+        train_main("opts_nenya_swot_fast.json", debug=False)
     #train_main("opts_nenya_viirs.json", debug=False)
 
 # Command line execution
 if __name__ == '__main__':
-    main()
+    import sys
+
+    if len(sys.argv) == 1:
+        flg = 0
+    else:
+        flg = sys.argv[1]
+
+    main(flg)

@@ -5,6 +5,11 @@ import json
 
 from nenya.train import main as train_main
 
+# aws s3 cp s3://odsl/nasa_oceanai_workshop2025/justin/swot_L2unsmoothed_1dayRepeat_ssr_images_unh/Pass_003.parquet . --profile nasa-oceanai
+# aws s3 cp s3://odsl/nasa_oceanai_workshop2025/justin/swot_L2unsmoothed_1dayRepeat_ssr_images_unh/Pass_003.h5 . --profile nasa-oceanai
+
+# cp ~/Oceanography/python/nenya/papers/InformationContent/Analysis/opts_nenya_swot_test.json .
+
 def main():
 
     # Train the model

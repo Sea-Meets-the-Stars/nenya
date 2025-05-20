@@ -17,6 +17,8 @@ import seaborn as sns
 
 from remote_sensing.plotting import utils as rsp_utils
 
+from nenya import plotting as nenya_plotting
+
 mpl.rcParams['font.family'] = 'stixgeneral'
 
 # Local
@@ -83,6 +85,17 @@ def fig_pca(outfile:str='fig_pca_variance.png'):
     plt.savefig(outfile, dpi=300)
     print(f"Saved: {outfile}")
 
+def fig_swot_learning_curve(outfile:str='fig_swot_learning_curve.png'):
+    path = os.path.join(os.getenv('SWOT_PNGs'),
+                        'models', 'SWOT',
+                        'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm')
+    valid_file = os.path.join(path, 'learning_curve',
+                              'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm_losses_valid.h5')
+    train_file = os.path.join(path, 'learning_curve',
+                              'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm_losses_train.h5')
+    nenya_plotting.fig_learn_curve(valid_file, train_file, outfile=outfile)
+
+
 def main(flg):
     if flg== 'all':
         flg= np.sum(np.array([2 ** ii for ii in range(25)]))
@@ -92,6 +105,10 @@ def main(flg):
     # PCA variaince
     if flg == 1:
         fig_pca()
+
+    # PCA variaince
+    if flg == 30:
+        fig_swot_learning_curve()
 
 # Command line execution
 if __name__ == '__main__':

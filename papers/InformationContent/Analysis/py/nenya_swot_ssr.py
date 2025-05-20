@@ -24,6 +24,9 @@ def main(flg):
     if flg == 2:
         train_main("opts_nenya_swot_fast.json", debug=False)
 
+    # s3
+    if flg == 3:
+        train_main("opts_nenya_swot_fast.json", debug=False)
     #train_main("opts_nenya_viirs.json", debug=False)
 
 # Command line execution

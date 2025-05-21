@@ -12,7 +12,7 @@ from remote_sensing.plotting import utils as plotting
 from IPython import embed
 
 
-def fig_learn_curve(valid_losses_file:str, train_losses_file:str, 
+def learn_curve(valid_losses_file:str, train_losses_file:str, 
                     ylog:bool=False, outfile:str='fig_learn_curve.png'):
     # Grab the data
     #embed(header='17 of plotting')

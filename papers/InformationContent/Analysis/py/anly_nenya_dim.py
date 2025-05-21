@@ -1,10 +1,7 @@
 """ Modules for analysis of dimensionality of Nenya data."""
 import os
-import h5py
 
-import numpy as np
-
-from sklearn import decomposition
+from nenya.pca import fit_latents
 
 def pca_latents(dataset:str):
 
@@ -30,27 +27,8 @@ def pca_latents(dataset:str):
     else:
         raise IOError("Bad dataset: {}".format(dataset))
 
-    # Load
-    fpath = os.path.join(path, filename)
-    print(f'Loading: {fpath}')
-    f = h5py.File(fpath, 'r')
-    latents = f[key][:]
-    f.close()
+    fit_latents(os.path.join(path, filename), outfile, key=key)
 
-    # PCA
-    print("Fitting PCA")
-    pca_fit = decomposition.PCA().fit(latents)
-
-    # Save
-    coeff = pca_fit.transform(latents)
-    #
-    outputs = dict(Y=coeff,
-                M=pca_fit.components_,
-                mean=pca_fit.mean_,
-                explained_variance=pca_fit.explained_variance_ratio_)
-    # Save
-    print(f"Saving: {outfile}")
-    np.savez(outfile, **outputs)
 
 # Command line execution
 if __name__ == '__main__':

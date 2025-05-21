@@ -7,6 +7,7 @@ import h5py
 from nenya.train import main as train_main
 from nenya import params 
 from nenya import latents_extraction
+from nenya.pca import fit_latents
 
 # aws s3 cp s3://odsl/nasa_oceanai_workshop2025/justin/swot_L2unsmoothed_1dayRepeat_ssr_images_unh/Pass_003.parquet . --profile nasa-oceanai
 # aws s3 cp s3://odsl/nasa_oceanai_workshop2025/justin/swot_L2unsmoothed_1dayRepeat_ssr_images_unh/Pass_003.h5 . --profile nasa-oceanai
@@ -79,6 +80,13 @@ def main(flg):
         evaluate("opts_nenya_swot_fast.json", 
                 os.path.join(swot_path,'Pass_006.h5'), 
                 debug=False, clobber=True)
+
+    # PCA
+    if flg == 20:
+        latents_file = os.path.join(swot_path,'Pass_006_latents.h5')
+        fit_latents(latents_file, 
+                os.path.join(swot_path,'Pass_006_pca.npz'), 
+                key='valid') 
 
 # Command line execution
 if __name__ == '__main__':

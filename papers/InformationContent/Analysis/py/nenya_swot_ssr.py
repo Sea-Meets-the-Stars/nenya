@@ -37,7 +37,9 @@ def evaluate(opt_path, pp_file:str, debug=False, clobber=False,
     params.option_preprocess(opt)
 
     # Prep
-    model_base, existing_files = latents_extraction.prep(opt)
+    model_file = os.path.join(opt.s3_outdir,
+        opt.model_folder, 'last.pth')
+    model_base = os.path.basename(model_file)
 
     print(f"Working on {pp_file}")
 

@@ -264,7 +264,6 @@ def model_latents_extract(opt, data_file,
 
         print("Beginning to evaluate")
         model.eval()
-        embed(header='Check 252')
         with torch.no_grad():
             latents_numpy = [calc_latent(
                 model, data[0], using_gpu) for data in tqdm.tqdm(

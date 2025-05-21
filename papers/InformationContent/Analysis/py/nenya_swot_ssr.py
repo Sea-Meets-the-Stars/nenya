@@ -73,6 +73,10 @@ def main(flg):
     # latents on Pass 006
     if flg == 10:
         evaluate("opts_nenya_swot_fast.json", 
+                os.path.join(swot_path,'Pass_006_test.h5'), 
+                debug=False, clobber=True)
+    if flg == 11:
+        evaluate("opts_nenya_swot_fast.json", 
                 os.path.join(swot_path,'Pass_006.h5'), 
                 debug=False, clobber=True)
 

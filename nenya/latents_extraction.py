@@ -16,6 +16,8 @@ from ulmo import io as ulmo_io
 
 from nenya.params import option_preprocess
 from nenya.train_util import set_model
+from nenya.train_util import NenyaDataset
+from nenya.train_util import TwoCropTransform
 from nenya import io as nenya_io
 
 from IPython import embed
@@ -31,7 +33,8 @@ class HDF5RGBDataset(torch.utils.data.Dataset):
         
     Objects will be returned in this order.
     """
-    def __init__(self, file_path, partition, allowed_indices=None):
+    def __init__(self, file_path, partition, allowed_indices=None,
+                 nchannels:int=1):
         super().__init__()
         self.file_path = file_path
         self.partition = partition
@@ -42,6 +45,8 @@ class HDF5RGBDataset(torch.utils.data.Dataset):
         self.allowed_indices = allowed_indices
         if self.allowed_indices is None:
             self.allowed_indices = np.arange(self.h5f[self.partition].shape[0])
+        # Channels
+        self.nchannels = nchannels
 
     def __len__(self):
         return self.allowed_indices.size
@@ -52,7 +57,10 @@ class HDF5RGBDataset(torch.utils.data.Dataset):
         data = self.h5f[self.partition][self.allowed_indices[index]]
         # Resize
         data = np.resize(data, (1, data.shape[-1], data.shape[-1]))
-        data = np.repeat(data, 3, axis=0)
+        if self.nchannels > 1:
+            # Resize to 3 channels
+            data = np.repeat(data, self.nchannels, axis=0)
+        #data = np.repeat(data, 3, axis=0)
         # Metadata
         metadata = None
         return data, metadata
@@ -105,7 +113,7 @@ def main(opt_path:str, pp_files:list, clobber:bool=False, debug:bool=False):
             os.remove(data_file)
             print(f'{data_file} removed')
 
-def build_loader(data_file, dataset, batch_size=1, num_workers=1,
+def build_loader(data_file, dataset, nchannels, batch_size=1, num_workers=1,
                  allowed_indices=None):
     # Generate dataset
     """
@@ -123,7 +131,13 @@ def build_loader(data_file, dataset, batch_size=1, num_workers=1,
         loader: (torch.utils.data.Dataloader) Dataloader created 
             using data_file.
     """
-    dset = HDF5RGBDataset(data_file, partition=dataset, allowed_indices=allowed_indices)
+    dset = HDF5RGBDataset(data_file, partition=dataset, 
+                          allowed_indices=allowed_indices,
+                          nchannels=nchannels)
+
+    #dset = NenyaDataset(data_file, data_key=dataset,
+    #                             transform=TwoCropTransform(
+    #                                 transforms_compose))
 
     # Generate DataLoader
     loader = torch.utils.data.DataLoader(
@@ -235,8 +249,9 @@ def model_latents_extract(opt, data_file,
                     print(f"Partition {partition} not found in {data_file}")
                     continue 
             # Data
-            _, loader = build_loader(data_file, partition, 
-                                        batch_size_eval, num_workers_eval,
+            _, loader = build_loader(data_file, partition, opt.nchannels,
+                                        batch_size=batch_size_eval, 
+                                        num_workers=num_workers_eval,
                                         allowed_indices=allowed_indices)
         else:
             loader = in_loader

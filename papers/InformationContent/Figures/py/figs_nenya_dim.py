@@ -93,7 +93,8 @@ def fig_swot_learning_curve(outfile:str='fig_swot_learning_curve.png'):
                               'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm_losses_valid.h5')
     train_file = os.path.join(path, 'learning_curve',
                               'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm_losses_train.h5')
-    nenya_plotting.fig_learn_curve(valid_file, train_file, outfile=outfile)
+    nenya_plotting.fig_learn_curve(valid_file, train_file, 
+                                   outfile=outfile, ylog=True)
 
 
 def main(flg):

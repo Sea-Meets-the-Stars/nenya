@@ -8,20 +8,13 @@ import h5py
 import numpy as np
 import argparse
 
-import pandas
-from functools import partial
-from concurrent.futures import ProcessPoolExecutor
-from tqdm import tqdm
 
-from matplotlib import pyplot as plt
-import seaborn as sns
 
 from ulmo import io as ulmo_io
 from ulmo.utils import catalog as cat_utils
 
 from nenya import train as nenya_train
 from nenya import latents_extraction
-from nenya import io as nenya_io
 from nenya import params 
 from nenya import nenya_umap
 from nenya import analyze_image

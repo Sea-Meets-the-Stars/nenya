@@ -12,8 +12,8 @@ from remote_sensing.plotting import utils as plotting
 from IPython import embed
 
 
-def fig_learn_curve(valid_losses_file:str, train_losses_file:str,
-                    outfile:str='fig_learn_curve.png'):
+def fig_learn_curve(valid_losses_file:str, train_losses_file:str, 
+                    ylog:bool=False, outfile:str='fig_learn_curve.png'):
     # Grab the data
     #embed(header='17 of plotting')
     with s3_io.open(valid_losses_file, 'rb') as f:
@@ -41,6 +41,9 @@ def fig_learn_curve(valid_losses_file:str, train_losses_file:str,
     # Label
     ax.set_xlabel("Epoch")
     ax.set_ylabel("Loss")
+
+    if ylog:
+        ax.set_yscale('log')
 
     plotting.set_fontsize(ax, 21.)
     

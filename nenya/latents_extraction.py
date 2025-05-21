@@ -9,10 +9,13 @@ import pandas as pd
 from tqdm.auto import trange
 
 import torch
+from torch.utils.data.dataloader import default_collate
+
 import tqdm
 
+
 from ulmo.utils import id_collate
-from ulmo import io as ulmo_io
+#from ulmo import io as ulmo_io
 
 from nenya.params import option_preprocess
 from nenya.train_util import set_model
@@ -274,4 +277,12 @@ def model_latents_extract(opt, data_file,
 
     #return np.concatenate(latents_numpy)
     return latent_dict
+    
+def id_collate(batch):
+    new_batch = []
+    ids = []
+    for _batch in batch:
+        new_batch.append(_batch[0])
+        ids.append(_batch[1])
+    return default_collate(new_batch), np.array(ids)
     

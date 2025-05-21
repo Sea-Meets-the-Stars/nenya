@@ -84,6 +84,10 @@ def main(flg):
         evaluate("opts_nenya_swot_fast.json", 
                 os.path.join(swot_path,'Pass_006.h5'), 
                 debug=False, clobber=True)
+    if flg == 12:
+        evaluate("opts_nenya_swot_fast.json", 
+                os.path.join(swot_path, 'ClassEx', 'Examples.h5'), 
+                debug=False, clobber=True)
 
     # PCA
     if flg == 20:

@@ -89,6 +89,18 @@ def fig_swot_learning_curve(outfile:str='fig_swot_learning_curve.png'):
     nenya_plotting.learn_curve(valid_file, train_file, 
                                    outfile=outfile, ylog=True)
 
+def fig_swot_umap(outfile:str='fig_swot_umap_gallery.png'):
+    swot_path = os.getenv('SWOT_PNGs')
+    tbl_file = os.path.join(swot_path,'Pass_006.parquet')
+    img_file = os.path.join(swot_path,'Pass_006.h5')
+    nenya_plotting.umap_gallery(tbl_file, img_file, 
+                                dxv=1.0, dyv=1.0,
+                                #scl_inset=(0.9,0.9),
+                                in_vmnx=(-0.5, 1.5),
+                                cbar_lbl='SWOT/SSR',
+                                outfile=outfile,
+                                debug=True,
+                                cmap="Greys",)
 
 def main(flg):
     if flg== 'all':
@@ -103,6 +115,11 @@ def main(flg):
     # PCA variaince
     if flg == 30:
         fig_swot_learning_curve()
+
+    # SWOT UMAP gallery
+    if flg == 40:
+        fig_swot_umap()
+
 
 # Command line execution
 if __name__ == '__main__':

@@ -28,36 +28,29 @@ mpl.rcParams['font.family'] = 'stixgeneral'
 from IPython import embed
 
 
-def fig_pca(outfile:str='fig_pca_variance.png'): 
+def fig_pca(outfile:str='fig_pca_variance.png',
+            exponent:float=-0.5): 
 
     # Load PCAs
     ds = []
-    datasets = ['MODIS_SST', 'VIIRS_SST', 'LLC_SST']
+    datasets = ['MODIS_SST', 'VIIRS_SST', 'LLC_SST', 'SWOT_SSR']
     #datasets = ['MODIS_SST']
     for dataset in datasets:
         d = np.load(f'../Analysis/pca_latents_{dataset}.npz')
         ds.append(d)
 
-    # "Fit" 1
-    d = ds[0]
-    xs = np.arange(len(d['explained_variance'])) + 1
-    exponent = -0.5
-    ys = d['explained_variance'][10] * (xs/xs[10])**(exponent) 
-
-    # "Fit" 1
-    d = ds[0]
-    xs = np.arange(len(d['explained_variance'])) + 1
-    exponent = -0.5
-    ys = d['explained_variance'][10] * (xs/xs[10])**(exponent) 
-
+    # 
     fig = plt.figure(figsize=(8,6))
     gs = gridspec.GridSpec(1,1)
 
-
     ax = plt.subplot(gs[0])
     for ss, d in enumerate(ds):
-        ax.plot(xs, d['explained_variance'], 'o', label=datasets[ss])
-        #ax.plot(xs, d['explained_variance'], 'o', label='Explained Variance')
+        ax.plot(np.arange(d['explained_variance'].size)+1, 
+                d['explained_variance'], 'o', label=datasets[ss])
+        if ss == 0:
+            xs = np.arange(d['explained_variance'].size)+1
+
+    ys = d['explained_variance'][10] * (xs/xs[10])**(exponent) 
     ax.plot(xs, ys, '--', color='gray', label=f'Power law: {exponent}')
     # Label
     ax.set_ylabel('Variance explained per mode')

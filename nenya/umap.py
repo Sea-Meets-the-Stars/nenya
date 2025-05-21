@@ -442,71 +442,57 @@ def regional_analysis(geo_region:str, tbl:pandas.DataFrame, nxy:int,
     # Return
     return counts, counts_geo, tbl, grid, xedges, yedges
 
+def umap_latents(latents_files:list, debug:bool=False,
+                 train_umap:bool=True, ntrain:int=200000,
+                 umap_savefile:str=None,
+                 keys='valid'):
+    # Checks
+    if not train_umap and umap_savefile is None:
+        raise IOError("Need to provide a umap_savefile if not training")
 
-def old_latents_umap(latents:np.ndarray, train:np.ndarray, 
-         valid:np.ndarray, valid_tbl:pandas.DataFrame,
-         fig_root='', transformer_file=None):
-    """ Run a UMAP on input latent vectors.
-    A subset are used to train the UMAP and then
-    one applies it to the valid set.
+    all_latents = []
+    sv_idx = []
+    if not isinstance(keys, list):
+        keys = [keys]*len(latents_files)
+    for key, latents_file in zip(keys, latents_files):
+        if debug:
+            embed(header='223 of umap')
 
-    The UMAP U0, U1 coefficients are written to an input table.
+        #  Load and apply
+        print(f"Ingesting {latents_file}")
+        hf = h5py.File(latents_file, 'r')
+        all_latents.append(hf[key][:])
+        hf.close()
 
-    Args:
-        latents (np.ndarray): Total set of latent vectors (training+valid)
-            Shape should be (nvectors, size of latent space)
-        train (np.ndarray): indices for training
-        valid (np.ndarray): indices for applying the UMAP
-        valid_tbl (pandas.DataFrame): [description]
-        fig_root (str, optional): [description]. Defaults to ''.
-        transformer_file (str, optional): Write the UMAP fit to this file
-    """
-    raise ValueError("This is old code. Deprecate it")  
+    # Concatenate
+    all_latents = np.concatenate(all_latents, axis=0)
+    nlatents = all_latents.shape[0]
 
     # UMAP me
-    print("Running UMAP..")
-    reducer_umap = umap.UMAP()
-    latents_mapping = reducer_umap.fit(latents[train])
-    if transformer_file is not None:
-        pickle.dump(latents_mapping, open(transformer_file, "wb" ) )
-        tmp = pickle.load(ulmo_io.open(transformer_file, "rb" ) )
-    print("Done")
+    if debug:
+        embed(header='218 of umap')
 
-    # Apply to embedding
-    print("Applying to the valid images")
-    train_embedding = latents_mapping.transform(latents[train])
-    valid_embedding = latents_mapping.transform(latents[valid])
-    print("Done")
+    if train_umap:
+        ntrain = min(ntrain, nlatents)
+        print(f"Training UMAP on a random {ntrain} set of the files")
+        random = np.random.choice(np.arange(nlatents), size=ntrain, 
+                                replace=False)
+        reducer_umap = umap.UMAP(random_state=42)
+        latents_mapping = reducer_umap.fit(all_latents[random,...])
+        print("Done..")
 
-    # Quick figures
-    if len(fig_root) > 0:
-        print("Generating plots")
-        num_samples = train.size
-        point_size = 20.0 / np.sqrt(num_samples)
-        dpi = 100
-        width, height = 800, 800
+        # Save?
+        if umap_savefile is not None:
+            pickle.dump(latents_mapping, open(umap_savefile, "wb" ) )
+            print(f"Saved UMAP to {umap_savefile}")
+    else:
+        latents_mapping = pickle.load(open(umap_savefile, "rb" ) )
+        print(f"Loaded UMAP from {umap_savefile}")
 
-        plt.figure(figsize=(width//dpi, height//dpi))
-        plt.scatter(latents_mapping.embedding_[:, 0], 
-            latents_mapping.embedding_[:, 1], s=point_size)
-        plt.savefig(fig_root+'_train_UMAP.png')
 
-        # New plot
-        num_samplesv = latents[valid].shape[0]
-        point_sizev = 1.0 / np.sqrt(num_samplesv)
-        plt.figure(figsize=(width//dpi, height//dpi))
-        ax = plt.gca()
-        img = ax.scatter(valid_embedding[:, 0], 
-                valid_embedding[:, 1], s=point_sizev,
-            c=valid_tbl.LL, cmap='jet', vmin=-1000)
-        cb = plt.colorbar(img, pad=0.)
-        cb.set_label('LL', fontsize=20.)
-        #
-        ax.set_xlabel(r'$U_0$')
-        ax.set_ylabel(r'$U_1$')
-        plotting.set_fontsize(ax, 15.)
-        #
-        plt.savefig(fig_root+'_valid_UMAP.png', dpi=300)
+    # Evaluate all of the latents
+    print("Embedding all of the latents..")
+    embeddings = latents_mapping.transform(all_latents)
 
     # Return
-    return train_embedding, valid_embedding, latents_mapping
+    return latents_mapping, embeddings

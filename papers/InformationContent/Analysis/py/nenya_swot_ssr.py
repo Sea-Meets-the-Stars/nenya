@@ -3,11 +3,15 @@
 import os
 
 import h5py
+import pandas
+
 
 from nenya.train import main as train_main
 from nenya import params 
 from nenya import latents_extraction
 from nenya.pca import fit_latents
+from nenya.umap import umap_latents
+from nenya import io as nenya_io
 
 # aws s3 cp s3://odsl/nasa_oceanai_workshop2025/justin/swot_L2unsmoothed_1dayRepeat_ssr_images_unh/Pass_003.parquet . --profile nasa-oceanai
 # aws s3 cp s3://odsl/nasa_oceanai_workshop2025/justin/swot_L2unsmoothed_1dayRepeat_ssr_images_unh/Pass_003.h5 . --profile nasa-oceanai
@@ -87,6 +91,22 @@ def main(flg):
         fit_latents(latents_file, 
                 os.path.join(swot_path,'Pass_006_pca.npz'), 
                 key='valid') 
+
+    # UMAP
+    if flg == 30:
+        latents_file = os.path.join(swot_path,'Pass_006_latents.h5')
+        tbl_file = os.path.join(swot_path,'Pass_006.parquet')
+        umap_file = os.path.join(swot_path,'Pass_006_umap.pkl')
+        _, embeddings = umap_latents([latents_file],
+                umap_savefile=umap_file)
+
+        # Save the embedding to the parquet
+        tbl = nenya_io.load_main_table(tbl_file)
+        tbl['US0'] = embeddings[:,0]
+        tbl['US1'] = embeddings[:,1]
+        nenya_io.write_main_table(tbl, tbl_file, to_s3=False)
+        print(f"Wrote {tbl_file} with embeddings")
+
 
 # Command line execution
 if __name__ == '__main__':

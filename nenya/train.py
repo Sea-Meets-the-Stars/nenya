@@ -13,6 +13,8 @@ from nenya import params
 from nenya.util import set_optimizer, save_model
 from nenya.util import adjust_learning_rate
 
+from IPython import embed
+
 
 def main(opt_path: str, debug:bool=False):
     """
@@ -48,6 +50,7 @@ def main(opt_path: str, debug:bool=False):
 
         # train for one epoch
         time1 = time.time()
+
         loss, losses_step, losses_avg = train_model(
             train_loader, model, criterion, optimizer, epoch, opt, 
             cuda_use=opt.cuda_use)

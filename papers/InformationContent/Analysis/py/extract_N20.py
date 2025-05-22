@@ -24,7 +24,7 @@ if __name__ == '__main__':
 
     # One year at a time
     #for year in range(2020, 2025):
-    for year in range(2022, 2025):
+    for year in range(2023, 2025):
         tstart = f'{year}-01-01T00:00:00'
         tend = f'{year}-12-31T23:59:59'
 

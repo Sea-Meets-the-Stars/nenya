@@ -7,7 +7,7 @@ import pandas
 import h5py
 
 from wrangler.extract.grab_and_go import run as gg_run
-from wrangler import io as wr_io
+from wrangler import s3_io as wr_io
 
 from nenya import io as nenya_io
 
@@ -20,6 +20,9 @@ local_viirs_path = os.path.join(os.getenv('OS_SST'), 'VIIRS')
 viirs_path = 's3://viirs'
 extract_path = os.path.join(viirs_path, 'Extractions')
 local_extract_path = os.path.join(local_viirs_path, 'Extractions')
+local_preproc_path = os.path.join(local_viirs_path, 'Info', 'PreProc')
+local_info_path = os.path.join(local_viirs_path, 'Info')
+local_tables_path = os.path.join(local_viirs_path, 'Info', 'Tables')
 preproc_path = os.path.join(viirs_path, 'PreProc')
 tables_path = os.path.join(viirs_path, 'Tables')
 
@@ -36,6 +39,7 @@ def extract_viirs(dataset:str, eoption_file:str,
 def prep_for_training(tbl_file:str, 
                       extract_file:str, 
                       preproc_file:str, 
+                      train_tbl_file:str=None,
                       n_train:int=300000, 
                       n_valid:int=100000,
                       debug:bool=False):
@@ -50,6 +54,7 @@ def prep_for_training(tbl_file:str,
         n_valid (int, optional): Number of validation samples. Defaults to 100000.
     """
 
+    print(f"Preparing the data for training.  n_train={n_train}, n_valid={n_valid}")
     # Open the table
     df = nenya_io.load_main_table(tbl_file, verbose=True)
 
@@ -94,16 +99,18 @@ def prep_for_training(tbl_file:str,
 
         # Write
         print("Writing..")
-        train_f.create_dataset('train', data=sub_fields[:n_train])
-        train_f.create_dataset('valid', data=sub_fields[n_train:])
+        train_f.create_dataset('train', data=sub_fields[:n_train].astype(np.float32))
+        train_f.create_dataset('valid', data=sub_fields[n_train:].astype(np.float32))
         train_f.close()
+        print(f"Wrote {n_train} training and {n_valid} validation samples to {base_preproc}")
 
-        # Push to s3
-        print("Uploading..")
-        wr_io.upload_file_to_s3(base_preproc, preproc_file)
+        #wr_io.upload_file_to_s3(base_preproc, preproc_file)
 
         # Table
-        nenya_io.write_main_table(df, tbl_file, to_s3=True)
+        nenya_io.write_main_table(df, train_tbl_file, to_s3=False)
+
+        # Push to s3
+        print("Upload to s3 yourself!")
         
      
 
@@ -121,5 +128,6 @@ if __name__ == '__main__':
     # Prep for Training
     prep_for_training(os.path.join(tables_path, 'VIIRS_N21_2024.parquet'), 
                       os.path.join(local_extract_path, 'ex_VIIRS_N21_2024.h5'),
-                      os.path.join(preproc_path, 'train_VIIRS_N21_2024.h5'), 
-                      n_train=300000, n_valid=100000)#, debug=True)
+                      os.path.join(local_preproc_path, 'train_VIIRS_N21_2024.h5'), 
+                      os.path.join(local_tables_path, 'train_VIIRS_N21_2024.parquet'), 
+                      n_train=150000, n_valid=50000)#, debug=True)

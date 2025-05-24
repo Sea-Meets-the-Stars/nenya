@@ -2,14 +2,9 @@
 
 import os
 
-import numpy as np
-import pandas
-import h5py
-
 from wrangler.extract.grab_and_go import run as gg_run
-from wrangler import s3_io as wr_io
 
-from nenya import io as nenya_io
+import extract_utils
 
 from IPython import embed
 
@@ -36,81 +31,6 @@ def extract_viirs(dataset:str, eoption_file:str,
                        save_local_files=True,
                        debug_noasync=debug)
 
-def prep_for_training(tbl_file:str, 
-                      extract_file:str, 
-                      preproc_file:str, 
-                      train_tbl_file:str=None,
-                      n_train:int=300000, 
-                      n_valid:int=100000,
-                      debug:bool=False):
-    """Prepare the data for training
-
-    Args:
-        tbl_file (str): Parquet file with the data
-        train_file (str): Parquet file with the training data
-        extract_file (str): HDF5 file with the extracted data
-        preproc_file (str): HDF5 file with the pre-processed data
-        n_train (int, optional): Number of training samples. Defaults to 300000.
-        n_valid (int, optional): Number of validation samples. Defaults to 100000.
-    """
-
-    print(f"Preparing the data for training.  n_train={n_train}, n_valid={n_valid}")
-    # Open the table
-    df = nenya_io.load_main_table(tbl_file, verbose=True)
-
-    # Random select n_train samples and n_valid samples
-    idx_tv = np.random.choice(df.index, n_train+n_valid, replace=False)
-
-    # Split into training and validation
-    df['pp_file'] = preproc_file
-    df['pp_type'] = -1
-    # Set train
-    df.loc[idx_tv[:n_train], 'pp_type'] = 1
-    # Set valid
-    df.loc[idx_tv[n_train:], 'pp_type'] = 0
-    # Indices
-    df['pp_idx'] = -1
-    df.loc[idx_tv[:n_train], 'pp_idx'] = np.arange(n_train)
-    df.loc[idx_tv[n_train:], 'pp_idx'] = np.arange(n_valid)
-
-    # Data time
-    f = h5py.File(extract_file, 'r')
-    base_preproc = os.path.basename(preproc_file)
-    train_f = h5py.File(base_preproc, 'w')
-
-    # Save the training and validation data
-    if not debug:
-        # Load h5
-        print("Working on the fields..")
-        fields = f['fields'][:]
-        sub_fields = np.zeros((n_train+n_valid, fields.shape[1], fields.shape[2]), 
-                              dtype=np.float32)
-        for kk, idx in enumerate(idx_tv):
-            sub_fields[kk] = fields[idx]
-        del fields
-
-        # Inpaint
-        print("Inpainting..")
-        inpainted = f['inpainted_masks'][:]
-        for kk, idx in enumerate(idx_tv):
-            fill = np.isfinite(inpainted[idx])
-            sub_fields[kk][fill] = inpainted[idx][fill]
-        del inpainted
-
-        # Write
-        print("Writing..")
-        train_f.create_dataset('train', data=sub_fields[:n_train].astype(np.float32))
-        train_f.create_dataset('valid', data=sub_fields[n_train:].astype(np.float32))
-        train_f.close()
-        print(f"Wrote {n_train} training and {n_valid} validation samples to {base_preproc}")
-
-        #wr_io.upload_file_to_s3(base_preproc, preproc_file)
-
-        # Table
-        nenya_io.write_main_table(df, train_tbl_file, to_s3=False)
-
-        # Push to s3
-        print("Upload to s3 yourself!")
         
      
 
@@ -126,7 +46,7 @@ if __name__ == '__main__':
     '''
 
     # Prep for Training
-    prep_for_training(os.path.join(tables_path, 'VIIRS_N21_2024.parquet'), 
+    extract_utils.prep_for_training(os.path.join(tables_path, 'VIIRS_N21_2024.parquet'), 
                       os.path.join(local_extract_path, 'ex_VIIRS_N21_2024.h5'),
                       os.path.join(local_preproc_path, 'train_VIIRS_N21_2024.h5'), 
                       os.path.join(local_tables_path, 'train_VIIRS_N21_2024.parquet'), 

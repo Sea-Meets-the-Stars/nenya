@@ -78,10 +78,18 @@ def fig_pca(outfile:str='fig_pca_variance.png',
     plt.savefig(outfile, dpi=300)
     print(f"Saved: {outfile}")
 
-def fig_swot_learning_curve(outfile:str='fig_swot_learning_curve.png'):
-    path = os.path.join(os.getenv('SWOT_PNGs'),
+def fig_learning_curve(dataset:str='SWOT'):
+    outfile=f'fig_{dataset}_learning_curve.png'
+    if dataset == 'SWOT':
+        path = os.path.join(os.getenv('SWOT_PNGs'),
                         'models', 'SWOT',
                         'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm')
+    elif dataset == 'VIIRS':
+        path = os.path.join(os.getenv('OS_SST'), 'VIIRS', 'Info',
+                        'models', 'VIIRS_N21',
+                        'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm')
+    else:
+        raise ValueError(f"Dataset {dataset} not supported for learning curve plotting.")
     valid_file = os.path.join(path, 'learning_curve',
                               'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm_losses_valid.h5')
     train_file = os.path.join(path, 'learning_curve',
@@ -112,9 +120,10 @@ def main(flg):
     if flg == 1:
         fig_pca()
 
-    # PCA variaince
+    # SWOT learning curve
     if flg == 30:
-        fig_swot_learning_curve()
+        #fig_learning_curve('SWOT')
+        fig_learning_curve('VIIRS')
 
     # SWOT UMAP gallery
     if flg == 40:

@@ -88,12 +88,20 @@ def fig_learning_curve(dataset:str='SWOT'):
         path = os.path.join(os.getenv('OS_SST'), 'VIIRS', 'Info',
                         'models', 'VIIRS_N21',
                         'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm')
+    elif dataset == 'MODIS':
+        path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Info',
+                        'models', 'MODIS_2021',
+                        'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm')
     else:
         raise ValueError(f"Dataset {dataset} not supported for learning curve plotting.")
+
+    # Load the learning curve files
     valid_file = os.path.join(path, 'learning_curve',
                               'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm_losses_valid.h5')
     train_file = os.path.join(path, 'learning_curve',
                               'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm_losses_train.h5')
+
+    # Plot the learning curve
     nenya_plotting.learn_curve(valid_file, train_file, 
                                    outfile=outfile, ylog=True)
 
@@ -123,7 +131,8 @@ def main(flg):
     # SWOT learning curve
     if flg == 30:
         #fig_learning_curve('SWOT')
-        fig_learning_curve('VIIRS')
+        #fig_learning_curve('VIIRS')
+        fig_learning_curve('MODIS')
 
     # SWOT UMAP gallery
     if flg == 40:

@@ -310,7 +310,9 @@ def nenya_loader(opt, valid=False):
         augment_list.append(RandomFlip())
     if opt.rotate:
         augment_list.append(RandomRotate())
-    if opt.random_cropjitter == 0:
+    if opt.random_cropjitter is None:
+        pass
+    elif opt.random_cropjitter == 0:
         augment_list.append(JitterCrop())
     else:
         augment_list.append(JitterCrop(crop_dim=opt.random_cropjitter[0],

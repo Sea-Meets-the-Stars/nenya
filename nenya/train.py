@@ -18,15 +18,14 @@ from nenya.util import adjust_learning_rate
 from IPython import embed
 
 
-def main(opt_path:str, debug:bool=False, load:bool=False, epoch:int=10):
+def main(opt_path:str, debug:bool=False, load_epoch:int=None):
     """
     Trains a model using the specified parameters.
 
     Args:
         opt_path (str): The path to the parameters JSON file.
         debug (bool, optional): Whether to run in debug mode. Defaults to False.
-        load (bool, optional): Whether to load a pre-trained model. Defaults to False.
-        epoch (int, optional): The epoch number to load from. Defaults to 10.
+        load_epoch (bool, optional): If provided, the model will be loaded from this epoch.
     """
     # loading parameters json file
     opt = params.Params(opt_path)
@@ -52,8 +51,8 @@ def main(opt_path:str, debug:bool=False, load:bool=False, epoch:int=10):
     # set start_epoch
     start_epoch = 1
     # Load pre-trained model if requested
-    if load:
-        model_file = os.path.join(opt.model_folder, f'ckpt_epoch_{epoch}.pth')
+    if load_epoch is not None:
+        model_file = os.path.join(opt.model_folder, f'ckpt_epoch_{load_epoch}.pth')
 
         if not os.path.exists(model_file):
             print(f"Warning: Model file '{model_file}' not found.")
@@ -79,13 +78,13 @@ def main(opt_path:str, debug:bool=False, load:bool=False, epoch:int=10):
             return
 
     # Adjust total epochs if loading from a checkpoint
-    if load and start_epoch > opt.epochs:
+    if load_epoch is not None and start_epoch > opt.epochs:
         print(f"Warning: Starting epoch ({start_epoch}) is greater than total epochs ({opt.epochs})")
         print("No additional training needed.")
         return
 
     # Loop me
-    for epoch in trange(1, opt.epochs + 1): 
+    for epoch in trange(start_epoch, opt.epochs + 1): 
         train_loader = nenya_loader(opt)
         adjust_learning_rate(opt, optimizer, epoch)
 

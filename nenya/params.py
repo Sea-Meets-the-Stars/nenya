@@ -65,7 +65,7 @@ def option_preprocess(opt:Params):
 
     # check if dataset is path that passed required arguments
     if opt.nenya_data is True:
-        assert opt.data_folder is not None, "Please prove data_folder in opt.json file." 
+        assert opt.data_folder is not None, "Please provide data_folder in opt.json file." 
 
     # set the path according to the environment
     if opt.data_folder is None:

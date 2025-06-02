@@ -69,7 +69,7 @@ def main(opt_path:str, debug:bool=False, load_epoch:int=None):
         optimizer.load_state_dict(checkpoint['optimizer'])
 
         # Set starting epoch
-        start_epoch = epoch + 1
+        start_epoch = load_epoch + 1
         print(f"Model Loading Sucessfully!")
 
         #except Exception as e:

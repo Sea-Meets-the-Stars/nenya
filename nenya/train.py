@@ -60,22 +60,22 @@ def main(opt_path:str, debug:bool=False, load_epoch:int=None):
             print("Training stopped.")
             return
 
-        try:
-            print(f"Loading model from epoch {load_epoch}: {model_file}")
-            checkpoint = torch.load(model_file, map_location='cpu' if not opt.cuda_use else 'cuda')
+        #try:
+        print(f"Loading model from epoch {load_epoch}: {model_file}")
+        checkpoint = torch.load(model_file, map_location='cpu' if not opt.cuda_use else 'cuda')
 
-            # Load model state
-            model.load_state_dict(checkpoint['model'])
-            optimizer.load_state_dict(checkpoint['optimizer'])
+        # Load model state
+        model.load_state_dict(checkpoint['model'])
+        optimizer.load_state_dict(checkpoint['optimizer'])
 
-            # Set starting epoch
-            start_epoch = epoch + 1
-            print(f"Model Loading Sucessfully!")
+        # Set starting epoch
+        start_epoch = epoch + 1
+        print(f"Model Loading Sucessfully!")
 
-        except Exception as e:
-            print(f"Error loading model from {model_file}: {e}")
-            print("Training stopped.")
-            return
+        #except Exception as e:
+        #    print(f"Error loading model from {model_file}: {e}")
+        #    print("Training stopped.")
+        #    return
 
     # Adjust total epochs if loading from a checkpoint
     if load_epoch is not None and start_epoch > opt.epochs:

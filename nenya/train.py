@@ -61,7 +61,7 @@ def main(opt_path:str, debug:bool=False, load_epoch:int=None):
             return
 
         try:
-            print(f"Loading model from epoch {epoch}: {model_file}")
+            print(f"Loading model from epoch {load_epoch}: {model_file}")
             checkpoint = torch.load(model_file, map_location='cpu' if not opt.cuda_use else 'cuda')
 
             # Load model state

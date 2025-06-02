@@ -5,7 +5,7 @@ from io import BytesIO
 
 import pandas
 
-from wrangler import s3_io as wr_io
+from wrangler import io as wr_io
 
 from nenya import params
 

@@ -8,8 +8,8 @@ from nenya.train import main as train_main
 def main():
 
     # Train the model
-    train_main("opts_nenya_modis.json", debug=False)
-    #train_main("opts_nenya_viirs.json", debug=False)
+    #train_main("opts_nenya_modis.json", debug=False)
+    train_main("opts_nenya_modis.json", debug=False, load_epoch=21)
 
 # Command line execution
 if __name__ == '__main__':

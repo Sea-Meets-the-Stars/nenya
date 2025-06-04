@@ -22,14 +22,16 @@ def pca_latents(dataset:str):
         filename = 'LLC_nenya_training.h5'
         outfile='pca_latents_LLC_SST.npz'
         path = os.path.join(os.getenv('OS_OGCM'), 'LLC',
-                        'Nenya', 'latents', 'LLC_v1') 
-        key = 'train'
+                        'Nenya', 'latents', 'LLC_v1',
+                        'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_256_temp_0.07_trial_5_cosine_warm') 
+        key = None
     elif dataset == 'MNIST':
-        filename = 'LLC_nenya_training.h5'
-        outfile='pca_latents_LLC_SST.npz'
-        path = os.path.join(os.getenv('OS_DATA'), 'Natural',
-                        'MNIST', 'latents', 'LLC_v1') 
-        key = 'train'
+        mnist_path = os.getenv('OS_DATA')
+        mnist_path = os.path.join(mnist_path, 'Natural', 'MNIST', 'Info')
+        path = mnist_path
+        filename = 'mnist_resampled_latents.h5'
+        outfile='pca_latents_MNIST.npz'
+        key = None
     else:
         raise IOError("Bad dataset: {}".format(dataset))
 
@@ -46,3 +48,6 @@ if __name__ == '__main__':
 
     #  LLC SST
     pca_latents('LLC_SST')
+
+    # MNIST
+    #pca_latents('MNIST')

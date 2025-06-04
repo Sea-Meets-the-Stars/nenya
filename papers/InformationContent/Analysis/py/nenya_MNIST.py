@@ -5,8 +5,7 @@ import os
 from nenya.train import main as train_main
 from nenya import latents_extraction
 
-mnist_path = os.getenv('OS_DATA')
-mnist_path = os.path.join(mnist_path, 'Natural', 'MNIST', 'Info')
+mnist_path = os.path.join(os.getenv('OS_DATA'), 'Natural', 'MNIST', 'Info')
 
 def evaluate():
     # Evaluate the model for MNIST

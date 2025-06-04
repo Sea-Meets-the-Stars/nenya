@@ -6,6 +6,7 @@ import sys
 from importlib import resources
 
 import numpy as np
+import h5py
 
 import torch
 
@@ -16,6 +17,7 @@ import matplotlib.gridspec as gridspec
 import seaborn as sns
 
 from remote_sensing.plotting import utils as rsp_utils
+from wrangler import s3_io
 
 from nenya import plotting as nenya_plotting
 
@@ -33,7 +35,10 @@ def fig_pca(outfile:str='fig_pca_variance.png',
 
     # Load PCAs
     ds = []
-    datasets = ['MODIS_SST', 'VIIRS_SST', 'LLC_SST', 'SWOT_SSR']
+    datasets = ['MODIS_SST', 'VIIRS_SST', 
+                'LLC_SST', 
+                #'SWOT_SSR', 
+                'MNIST']
     #datasets = ['MODIS_SST']
     for dataset in datasets:
         d = np.load(f'../Analysis/pca_latents_{dataset}.npz')
@@ -78,8 +83,7 @@ def fig_pca(outfile:str='fig_pca_variance.png',
     plt.savefig(outfile, dpi=300)
     print(f"Saved: {outfile}")
 
-def fig_learning_curve(dataset:str='SWOT'):
-    outfile=f'fig_{dataset}_learning_curve.png'
+def dataset_path(dataset:str):
     if dataset == 'SWOT':
         path = os.path.join(os.getenv('SWOT_PNGs'),
                         'models', 'SWOT',
@@ -92,15 +96,67 @@ def fig_learning_curve(dataset:str='SWOT'):
         path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Info',
                         'models', 'MODIS_2021',
                         'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm')
+    elif dataset == 'MNIST':
+        path = os.path.join(os.getenv('OS_DATA'), 'Natural', 'MNIST', 'Info',
+                        'models', 'MNIST',
+                        'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm')
     else:
         raise ValueError(f"Dataset {dataset} not supported for learning curve plotting.")
+    return path
 
+def fig_learning_curves(outfile:str=f'fig_learning_curves.png'):
+    """Plot the learning curves for SWOT, VIIRS, MODIS and MNIST datasets."""
+    
+    # Define the datasets
+    datasets = ['VIIRS', 'MODIS', 'MNIST']
+    
+    # Create a figure
+    fig = plt.figure(figsize=(10, 10))
+    plt.clf()
+    ax = plt.gca()
+
+    for ss, dataset in enumerate(datasets):
+        path = dataset_path(dataset)
+        valid_file = os.path.join(path, 'learning_curve',
+                                  f'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm_losses_valid.h5')
+        train_file = os.path.join(path, 'learning_curve',
+                                  f'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm_losses_train.h5')
+        with s3_io.open(valid_file, 'rb') as f:
+            valid_hf = h5py.File(f, 'r')
+            loss_valid = valid_hf['loss_valid'][:]
+        with s3_io.open(train_file, 'rb') as f:
+            train_hf = h5py.File(f, 'r')
+            loss_train = train_hf['loss_train'][:]
+
+        # Plot
+        if ss == 0:
+            lbl0 = f'{dataset} validation'
+            lbl1 = f'{dataset} training'
+        else:
+            lbl0 = f'{dataset} validation'
+            lbl1 = f'{dataset} training'
+        ax.plot(np.arange(loss_valid.size)+1, loss_valid, label=lbl0, lw=3)
+        ax.plot(np.arange(loss_train.size)+1, loss_train, label=lbl1, lw=3)
+
+        
+        nenya_plotting.learn_curve(valid_file, train_file, 
+                                   ax=ax, ylog=True)
+    
+    axs[-1].set_xlabel('Epochs')
+    axs[0].set_ylabel('Loss (log scale)')
+    
+    plt.tight_layout()
+    plt.savefig(outfile, dpi=300)
+    print(f"Saved: {outfile}")
+
+def fig_learning_curve(dataset:str='SWOT'):
+    outfile=f'fig_{dataset}_learning_curve.png'
     # Load the learning curve files
+    path = dataset_path(dataset)
     valid_file = os.path.join(path, 'learning_curve',
                               'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm_losses_valid.h5')
     train_file = os.path.join(path, 'learning_curve',
                               'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm_losses_train.h5')
-
     # Plot the learning curve
     nenya_plotting.learn_curve(valid_file, train_file, 
                                    outfile=outfile, ylog=True)
@@ -132,7 +188,8 @@ def main(flg):
     if flg == 30:
         #fig_learning_curve('SWOT')
         #fig_learning_curve('VIIRS')
-        fig_learning_curve('MODIS')
+        #fig_learning_curve('MODIS')
+        fig_learning_curve('MNIST')
 
     # SWOT UMAP gallery
     if flg == 40:

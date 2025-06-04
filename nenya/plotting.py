@@ -16,7 +16,8 @@ from IPython import embed
 
 
 def learn_curve(valid_losses_file:str, train_losses_file:str, 
-                    ylog:bool=False, outfile:str='fig_learn_curve.png'):
+                ax=None, ylog:bool=False, outfile:str='fig_learn_curve.png'):
+
     # Grab the data
     #embed(header='17 of plotting')
     with s3_io.open(valid_losses_file, 'rb') as f:
@@ -30,11 +31,10 @@ def learn_curve(valid_losses_file:str, train_losses_file:str,
     train_hf.close()
 
     # Plot
-    fig = plt.figure(figsize=(10, 10))
-    plt.clf()
-    gs = gridspec.GridSpec(1,1)
-
-    ax = plt.subplot(gs[0])
+    if ax is None:
+        fig = plt.figure(figsize=(10, 10))
+        plt.clf()
+        ax = plt.gca()
 
     ax.plot(np.arange(loss_valid.size)+1, loss_valid, label='validation', lw=3)
     ax.plot(np.arange(loss_train.size)+1, loss_train, c='red', label='training', lw=3)
@@ -50,9 +50,12 @@ def learn_curve(valid_losses_file:str, train_losses_file:str,
 
     plotting.set_fontsize(ax, 21.)
     
-    plt.savefig(outfile, dpi=300)
-    plt.close()
-    print('Wrote {:s}'.format(outfile))
+    if outfile is not None:
+        plt.tight_layout()
+        plt.savefig(outfile, dpi=300)
+        plt.close()
+        print('Wrote {:s}'.format(outfile))
+    
 
 
 def umap_gallery(

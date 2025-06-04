@@ -7,20 +7,29 @@ from sklearn import decomposition
 
 def fit_latents(latents_file:str, 
                 outfile:str,  
-                key:str='valid'):
+                key:str=None):
     """ Fit PCA to latents file
     Args:
         latents_file (str): Latents file
         outfile (str): Output file
-        key (str): Key in latents file. Default is 'valid'
+        key (str):  If provided, restrict to this key in the latents file.
+                if None, use the whole file.
     """
     # Load
     f = h5py.File(latents_file, 'r')
-    latents = f[key][:]
+    keys = list(f.keys()) if key is None else [key]
+    latents = []
+    for key in keys:
+        if key not in f:
+            raise IOError(f"Key '{key}' not found in {latents_file}")
+        print(f"Loading latents for key: {key}")
+        # Load latents
+        latents.append(f[key][:])
+    latents = np.concatenate(latents, axis=0)
     f.close()
 
     # PCA
-    print("Fitting PCA")
+    print(f"Fitting PCA on {latents.shape[0]} samples with {latents.shape[1]} features")
     pca_fit = decomposition.PCA().fit(latents)
 
     # Save

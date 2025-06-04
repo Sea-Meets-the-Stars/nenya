@@ -25,43 +25,6 @@ swot_path = os.getenv('SWOT_PNGs')
 
 from IPython import embed
 
-def evaluate(opt_path, pp_file:str, debug=False, clobber=False, 
-             preproc:str='_std'):
-    """
-    This function is used to obtain the latents of the trained model
-    for all of VIIRS
-
-    Args:
-        opt_path: (str) option file path.
-        model_name: (str) model name 
-        clobber: (bool, optional)
-            If true, over-write any existing file
-    """
-    # Parse the model
-    opt = params.Params(opt_path)
-    params.option_preprocess(opt)
-
-    # Prep
-    model_file = os.path.join(opt.s3_outdir,
-        opt.model_folder, 'last.pth')
-    model_base = os.path.basename(model_file)
-
-    print(f"Working on {pp_file}")
-
-    # Setup
-    latents_file = pp_file.replace('.h5', '_latents.h5')
-
-    # Extract
-    print("Extracting latents")
-    #embed(header='Check 49')
-    latent_dict = latents_extraction.model_latents_extract(
-        opt, pp_file, model_base, debug=debug)
-    # Save
-    latents_hf = h5py.File(latents_file, 'w')
-    for partition in latent_dict.keys():
-        latents_hf.create_dataset(partition, data=latent_dict[partition])
-    latents_hf.close()
-
 
 def main(flg):
 
@@ -77,15 +40,15 @@ def main(flg):
 
     # latents on Pass 006
     if flg == 10:
-        evaluate("opts_nenya_swot_fast.json", 
+        latents_extraction.evaluate("opts_nenya_swot_fast.json", 
                 os.path.join(swot_path,'Pass_006_test.h5'), 
                 debug=False, clobber=True)
     if flg == 11:
-        evaluate("opts_nenya_swot_fast.json", 
+        latents_extraction.evaluate("opts_nenya_swot_fast.json", 
                 os.path.join(swot_path,'Pass_006.h5'), 
                 debug=False, clobber=True)
     if flg == 12:
-        evaluate("opts_nenya_swot_fast.json", 
+        latents_extraction.evaluate("opts_nenya_swot_fast.json", 
                 os.path.join(swot_path, 'ClassEx', 'Examples.h5'), 
                 debug=False, clobber=True)
 

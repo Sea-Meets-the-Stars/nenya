@@ -18,7 +18,7 @@
     "momentum": 0.9,
     "ssl_method": "SimCLR",
     "ssl_model": "resnet50",
-    "model_root": "models/MNIST",
+    "model_root": "MNIST",
     "sensor": "MNIST",
     "data_folder": "./",
     "images_file": "mnist_resampled.h5",

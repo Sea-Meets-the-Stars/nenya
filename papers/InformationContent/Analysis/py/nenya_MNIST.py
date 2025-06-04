@@ -1,12 +1,29 @@
 """ Run Nenya on the MNIST dataset """
 
-from nenya.train import main as train_main
+import os
 
-def main():
+from nenya.train import main as train_main
+from nenya import latents_extraction
+
+mnist_path = os.getenv('OS_DATA')
+mnist_path = os.path.join(mnist_path, 'Natural', 'MNIST', 'Info')
+
+def evaluate():
+    # Evaluate the model for MNIST
+    latents_extraction.evaluate("opts_nenya_mnist.json", 
+                os.path.join(mnist_path,'mnist_resampled.h5'), 
+                local_model_path=mnist_path,
+                debug=False, clobber=True)
+
+def train():
 
     # Train the model
     train_main("opts_nenya_mnist.json", debug=False)
 
 # Command line execution
 if __name__ == '__main__':
-    main()
+    # Train
+    #train()
+
+    # Evaluate
+    evaluate()

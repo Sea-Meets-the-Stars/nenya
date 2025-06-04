@@ -24,6 +24,12 @@ def pca_latents(dataset:str):
         path = os.path.join(os.getenv('OS_OGCM'), 'LLC',
                         'Nenya', 'latents', 'LLC_v1') 
         key = 'train'
+    elif dataset == 'MNIST':
+        filename = 'LLC_nenya_training.h5'
+        outfile='pca_latents_LLC_SST.npz'
+        path = os.path.join(os.getenv('OS_DATA'), 'Natural',
+                        'MNIST', 'latents', 'LLC_v1') 
+        key = 'train'
     else:
         raise IOError("Bad dataset: {}".format(dataset))
 

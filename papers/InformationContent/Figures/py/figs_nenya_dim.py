@@ -17,6 +17,7 @@ import matplotlib.gridspec as gridspec
 import seaborn as sns
 
 from remote_sensing.plotting import utils as rsp_utils
+
 from wrangler import s3_io
 
 from nenya import plotting as nenya_plotting
@@ -29,6 +30,14 @@ mpl.rcParams['font.family'] = 'stixgeneral'
 
 from IPython import embed
 
+# Color eict
+cdict = {}
+cdict['MODIS'] = '#1f77b4'  # Blue
+cdict['VIIRS'] = '#ff7f0e'  # Orange
+cdict['LLC'] = '#2ca02c'  # Green
+cdict['MNIST'] = '#d62728'  # Red
+cdict['SWOT_SSR'] = '#9467bd'  # Purple
+
 
 def fig_pca(outfile:str='fig_pca_variance.png',
             exponent:float=-0.5): 
@@ -40,9 +49,18 @@ def fig_pca(outfile:str='fig_pca_variance.png',
                 #'SWOT_SSR', 
                 'MNIST']
     #datasets = ['MODIS_SST']
+    clrs = []
     for dataset in datasets:
+        if 'SST' in dataset:
+            clr = cdict[dataset.replace('_SST', '')]
+        else:
+            clr = cdict[dataset]
+        
+        idataset = dataset.replace('_SST', '')
         d = np.load(f'../Analysis/pca_latents_{dataset}.npz')
         ds.append(d)
+        #
+        clrs.append(clr)
 
     # 
     fig = plt.figure(figsize=(8,6))
@@ -51,7 +69,8 @@ def fig_pca(outfile:str='fig_pca_variance.png',
     ax = plt.subplot(gs[0])
     for ss, d in enumerate(ds):
         ax.plot(np.arange(d['explained_variance'].size)+1, 
-                d['explained_variance'], 'o', label=datasets[ss])
+                d['explained_variance'], 'o', label=datasets[ss],
+                color=clrs[ss])
         if ss == 0:
             xs = np.arange(d['explained_variance'].size)+1
 
@@ -116,6 +135,7 @@ def fig_learning_curves(outfile:str=f'fig_learning_curves.png'):
     ax = plt.gca()
 
     for ss, dataset in enumerate(datasets):
+        clr = cdict[dataset]
         path = dataset_path(dataset)
         valid_file = os.path.join(path, 'learning_curve',
                                   f'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm_losses_valid.h5')
@@ -133,17 +153,19 @@ def fig_learning_curves(outfile:str=f'fig_learning_curves.png'):
             lbl0 = f'{dataset} validation'
             lbl1 = f'{dataset} training'
         else:
-            lbl0 = f'{dataset} validation'
-            lbl1 = f'{dataset} training'
-        ax.plot(np.arange(loss_valid.size)+1, loss_valid, label=lbl0, lw=3)
-        ax.plot(np.arange(loss_train.size)+1, loss_train, label=lbl1, lw=3)
+            lbl0 = None
+            lbl1 = f'{dataset}'
+        ax.plot(np.arange(loss_valid.size)+1, loss_valid, label=lbl0, lw=3, color=clr, ls='--')
+        ax.plot(np.arange(loss_train.size)+1, loss_train, label=lbl1, lw=3, color=clr)
 
         
-        nenya_plotting.learn_curve(valid_file, train_file, 
-                                   ax=ax, ylog=True)
-    
-    axs[-1].set_xlabel('Epochs')
-    axs[0].set_ylabel('Loss (log scale)')
+    ax.set_xlabel('Epochs')
+    ax.set_ylabel('Loss (log scale)')
+    ax.set_yscale('log')
+
+    ax.legend(fontsize=15, loc='upper right')
+
+    rsp_utils.set_fontsize(ax, 21.)
     
     plt.tight_layout()
     plt.savefig(outfile, dpi=300)
@@ -180,8 +202,12 @@ def main(flg):
     else:
         flg= int(flg)
 
-    # PCA variaince
+    # Learning curves
     if flg == 1:
+        fig_learning_curves()
+
+    # PCA variaince
+    if flg == 2:
         fig_pca()
 
     # SWOT learning curve

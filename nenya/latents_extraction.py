@@ -271,19 +271,26 @@ def model_latents_extract(opt, data_file,
         partitions: (list) list of keys in the h5py file [e.g. 'train', 'valid'].
         in_loader: (torch.utils.data.DataLoader, optional) Use this DataLoader, if provided
         allowed_indices: (np.ndarray) Set of images that can be grabbed
+        remove_module: (bool) If True, remove 'module.' from the keys in the model state dict.
+        debug: (bool) If True, run in debug mode (e.g., only a few batches)
 
     Returns:
         latent_dict: (dict) dictionary of latents for each partition.
     """
     using_gpu = torch.cuda.is_available()
     print("Using GPU: ", using_gpu)
+
+    # Specify the model
     model, _ = set_model(opt, cuda_use=using_gpu)
     #embed(header='model_latents_extract 281')
+
+    # Load model
     if not using_gpu:
         model_dict = torch.load(model_path, map_location=torch.device('cpu'))
     else:
         model_dict = torch.load(model_path, weights_only=False)
 
+    # Remove module?
     if remove_module:
         new_dict = {}
         for key in model_dict['model'].keys():

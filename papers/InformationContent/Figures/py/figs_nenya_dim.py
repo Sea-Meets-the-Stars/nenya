@@ -38,6 +38,26 @@ cdict['LLC'] = '#2ca02c'  # Green
 cdict['MNIST'] = '#d62728'  # Red
 cdict['SWOT_SSR'] = '#9467bd'  # Purple
 
+def dataset_path(dataset:str):
+    if dataset == 'SWOT':
+        path = os.path.join(os.getenv('SWOT_PNGs'),
+                        'models', 'SWOT',
+                        'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm')
+    elif dataset == 'VIIRS':
+        path = os.path.join(os.getenv('OS_SST'), 'VIIRS', 'Info',
+                        'models', 'VIIRS_N21',
+                        'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm')
+    elif dataset == 'MODIS':
+        path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Info',
+                        'models', 'MODIS_2021',
+                        'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm')
+    elif dataset == 'MNIST':
+        path = os.path.join(os.getenv('OS_DATA'), 'Natural', 'MNIST', 'Info',
+                        'models', 'MNIST',
+                        'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm')
+    else:
+        raise ValueError(f"Dataset {dataset} not supported for learning curve plotting.")
+    return path
 
 def fig_pca(outfile:str='fig_pca_variance.png',
             exponent:float=-0.5): 
@@ -56,7 +76,6 @@ def fig_pca(outfile:str='fig_pca_variance.png',
         else:
             clr = cdict[dataset]
         
-        idataset = dataset.replace('_SST', '')
         d = np.load(f'../Analysis/pca_latents_{dataset}.npz')
         ds.append(d)
         #
@@ -69,7 +88,7 @@ def fig_pca(outfile:str='fig_pca_variance.png',
     ax = plt.subplot(gs[0])
     for ss, d in enumerate(ds):
         ax.plot(np.arange(d['explained_variance'].size)+1, 
-                d['explained_variance'], 'o', label=datasets[ss],
+                d['explained_variance'], 'o', label=datasets[ss].replace('_','/'),
                 color=clrs[ss])
         if ss == 0:
             xs = np.arange(d['explained_variance'].size)+1
@@ -102,26 +121,7 @@ def fig_pca(outfile:str='fig_pca_variance.png',
     plt.savefig(outfile, dpi=300)
     print(f"Saved: {outfile}")
 
-def dataset_path(dataset:str):
-    if dataset == 'SWOT':
-        path = os.path.join(os.getenv('SWOT_PNGs'),
-                        'models', 'SWOT',
-                        'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm')
-    elif dataset == 'VIIRS':
-        path = os.path.join(os.getenv('OS_SST'), 'VIIRS', 'Info',
-                        'models', 'VIIRS_N21',
-                        'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm')
-    elif dataset == 'MODIS':
-        path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Info',
-                        'models', 'MODIS_2021',
-                        'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm')
-    elif dataset == 'MNIST':
-        path = os.path.join(os.getenv('OS_DATA'), 'Natural', 'MNIST', 'Info',
-                        'models', 'MNIST',
-                        'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm')
-    else:
-        raise ValueError(f"Dataset {dataset} not supported for learning curve plotting.")
-    return path
+
 
 def fig_learning_curves(outfile:str=f'fig_learning_curves.png'):
     """Plot the learning curves for SWOT, VIIRS, MODIS and MNIST datasets."""

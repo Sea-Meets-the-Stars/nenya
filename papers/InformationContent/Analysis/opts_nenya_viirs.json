@@ -18,7 +18,7 @@
     "momentum": 0.9,
     "ssl_method": "SimCLR",
     "ssl_model": "resnet50",
-    "model_root": "models/VIIRS_N21",
+    "model_root": "VIIRS_N21",
     "sensor": "VIIRS",
     "data_folder": "./",
     "images_file": "train_VIIRS_N21_2024.h5",

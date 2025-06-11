@@ -63,6 +63,7 @@ class HDF5RGBDataset(torch.utils.data.Dataset):
 
 
 def evaluate(opt_path, pp_file:str, debug=False, clobber=False,
+             use_gpu:bool=None,
              local_model_path:str=None, model_name:str='last.pth'): 
     """
     This function is used to obtain the latents of the trained model
@@ -72,6 +73,8 @@ def evaluate(opt_path, pp_file:str, debug=False, clobber=False,
     Args:
         opt_path: (str) option file path.
         pp_file: (str) path of the pre-processed file.
+        use_gpu: (bool, optional)
+            Passed to model_latents_extract to specify if GPU should be used.
         debug: (bool, optional)
             If true, run in debug mode (e.g., only a few epochs)
         local_model_path: (str, optional)
@@ -108,11 +111,12 @@ def evaluate(opt_path, pp_file:str, debug=False, clobber=False,
 
     # Do it
     print(f"Working on {pp_file}")
+    print(f" with model {model_name}")
 
     # Extract
     print("Extracting latents")
     latent_dict = model_latents_extract(
-        opt, pp_file, model_name, debug=debug)
+        opt, pp_file, model_name, debug=debug, using_gpu=use_gpu)
 
     # Save
     latents_hf = h5py.File(latents_file, 'w')
@@ -256,6 +260,7 @@ def model_latents_extract(opt, data_file,
                           model_path, 
                           remove_module:bool=True, 
                           in_loader=None,
+                          using_gpu:bool=None,
                           partitions:tuple=('train', 'valid'),
                           allowed_indices=None,
                           debug:bool=False):
@@ -273,11 +278,14 @@ def model_latents_extract(opt, data_file,
         allowed_indices: (np.ndarray) Set of images that can be grabbed
         remove_module: (bool) If True, remove 'module.' from the keys in the model state dict.
         debug: (bool) If True, run in debug mode (e.g., only a few batches)
+        using_gpu: (bool, optional)
+            If None, will check if CUDA is available and set accordingly.
 
     Returns:
         latent_dict: (dict) dictionary of latents for each partition.
     """
-    using_gpu = torch.cuda.is_available()
+    if using_gpu is None:
+        using_gpu = torch.cuda.is_available()
     print("Using GPU: ", using_gpu)
 
     # Specify the model
@@ -286,7 +294,7 @@ def model_latents_extract(opt, data_file,
 
     # Load model
     if not using_gpu:
-        model_dict = torch.load(model_path, map_location=torch.device('cpu'))
+        model_dict = torch.load(model_path, map_location=torch.device('cpu'), weights_only=False)
     else:
         model_dict = torch.load(model_path, weights_only=False)
 

@@ -18,7 +18,7 @@
     "momentum": 0.9,
     "ssl_method": "SimCLR",
     "ssl_model": "resnet50",
-    "model_root": "models/MODIS_2021",
+    "model_root": "MODIS_2021",
     "sensor": "MODIS",
     "data_folder": "./",
     "images_file": "train_MODIS_2021_128x128.h5",

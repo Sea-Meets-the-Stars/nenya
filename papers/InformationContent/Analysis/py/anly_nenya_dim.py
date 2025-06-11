@@ -7,15 +7,21 @@ def pca_latents(dataset:str):
 
     # Load
     key = 'valid'
-    if dataset == 'MODIS_SST':
+    if dataset == 'MODIS_SST_2km':
         filename = 'MODIS_R2019_2004_95clear_128x128_latents_std.h5'
-        outfile='pca_latents_MODIS_SST.npz'
+        outfile='pca_latents_MODIS_SST_2km.npz'
         path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2',
                         'Nenya', 'latents/MODIS_R2019_v4_REDO',
                         'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_256_temp_0.07_trial_5_cosine_warm')
-    elif dataset == 'VIIRS_SST':
+    elif dataset == 'MODIS_SST':
+        outfile='pca_latents_MODIS_SST.npz'
+        path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2',
+                        'Info', 'latents/MODIS_2021',
+                        'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_256_temp_0.07_trial_5_cosine_warm')
+        filename = ''
+    elif dataset == 'VIIRS_SST_2km':
         filename = 'VIIRS_2013_98clear_192x192_latents_viirs_std_train.h5'
-        outfile='pca_latents_VIIRS_SST.npz'
+        outfile='pca_latents_VIIRS_SST_2km.npz'
         path = os.path.join(os.getenv('OS_SST'), 'VIIRS',
                         'Nenya', 'latents', 'VIIRS_v1') 
     elif dataset == 'LLC_SST':
@@ -41,13 +47,14 @@ def pca_latents(dataset:str):
 # Command line execution
 if __name__ == '__main__':
     # PCA MODIS SST
+    pca_latents('MODIS_SST_2km')
     #pca_latents('MODIS_SST')
 
     #  VIIRS SST
     #pca_latents('VIIRS_SST')
 
     #  LLC SST
-    pca_latents('LLC_SST')
+    #pca_latents('LLC_SST')
 
     # MNIST
     #pca_latents('MNIST')

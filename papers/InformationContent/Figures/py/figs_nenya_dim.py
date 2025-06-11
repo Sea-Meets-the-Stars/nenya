@@ -64,7 +64,7 @@ def fig_pca(outfile:str='fig_pca_variance.png',
 
     # Load PCAs
     ds = []
-    datasets = ['MODIS_SST', 'VIIRS_SST', 
+    datasets = ['MODIS_SST_2km', 'VIIRS_SST_2km', 
                 'LLC_SST', 
                 #'SWOT_SSR', 
                 'MNIST']
@@ -72,7 +72,7 @@ def fig_pca(outfile:str='fig_pca_variance.png',
     clrs = []
     for dataset in datasets:
         if 'SST' in dataset:
-            clr = cdict[dataset.replace('_SST', '')]
+            clr = cdict[dataset.split('_')[0]]
         else:
             clr = cdict[dataset]
         
@@ -87,9 +87,10 @@ def fig_pca(outfile:str='fig_pca_variance.png',
 
     ax = plt.subplot(gs[0])
     for ss, d in enumerate(ds):
+        ls = ':' if '2km' in datasets[ss] else '-'
         ax.plot(np.arange(d['explained_variance'].size)+1, 
-                d['explained_variance'], 'o', label=datasets[ss].replace('_','/'),
-                color=clrs[ss])
+                d['explained_variance'], label=datasets[ss].replace('_','/'),
+                color=clrs[ss], ls=ls)
         if ss == 0:
             xs = np.arange(d['explained_variance'].size)+1
 

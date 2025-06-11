@@ -11,6 +11,7 @@ import os
 import sys
 import h5py
 import numpy as np
+import pandas
 import requests
 import gzip
 import tarfile
@@ -21,6 +22,8 @@ from pathlib import Path
 import argparse
 from tqdm import tqdm
 import pickle
+
+from IPython import embed
 
 def download_file(url, filepath, description="Downloading"):
     """Download a file with progress bar"""
@@ -41,12 +44,14 @@ def download_file(url, filepath, description="Downloading"):
                 f.write(chunk)
                 pbar.update(len(chunk))
 
-def process_images_from_directory(image_dir, n_samples=200000):
+def process_images_from_directory(image_dir, n_samples=200000, 
+                                  debug:bool=False, isize:int=128):
     """Process images from a directory (for ImageNet or similar datasets)"""
     print(f"Processing images from: {image_dir}")
     
     # Get all image files
-    image_extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.tiff'}
+    #image_extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.tiff'}
+    image_extensions = {'.jpeg'}
     image_files = []
     
     for root, dirs, files in os.walk(image_dir):
@@ -55,9 +60,12 @@ def process_images_from_directory(image_dir, n_samples=200000):
                 image_files.append(Path(root) / file)
     
     print(f"Found {len(image_files)} image files")
+    if debug:
+        embed(header='Debugging Image Processing 66')
     
     if len(image_files) == 0:
         raise ValueError("No image files found in the specified directory")
+
     
     # Sample random images
     n_available = len(image_files)
@@ -68,6 +76,7 @@ def process_images_from_directory(image_dir, n_samples=200000):
     
     # Process images
     processed_images = []
+    base_files = []
     
     for img_path in tqdm(sampled_files, desc="Processing images"):
         try:
@@ -78,11 +87,13 @@ def process_images_from_directory(image_dir, n_samples=200000):
                     img = img.convert('L')
                 
                 # Resize to consistent size (you may want to adjust this)
-                img = img.resize((224, 224), Image.Resampling.LANCZOS)
+                img = img.resize((isize, isize), Image.Resampling.LANCZOS)
                 
                 # Convert to numpy array
                 img_array = np.array(img, dtype=np.float32) / 255.0
                 processed_images.append(img_array)
+                # Base
+                base_files.append(os.path.basename(img_path.name))
                 
         except Exception as e:
             print(f"Error processing {img_path}: {e}")
@@ -91,9 +102,10 @@ def process_images_from_directory(image_dir, n_samples=200000):
     processed_images = np.array(processed_images)
     print(f"Successfully processed {len(processed_images)} images")
     
-    return processed_images
+    return processed_images, base_files
 
-def process_imagenet(imagenet_path, output_dir, n_samples=200000):
+def process_imagenet(imagenet_path:Path, output_dir:Path, n_samples:int=200000,
+                     debug:bool=False):
     """Process ImageNet dataset"""
     if not imagenet_path or not Path(imagenet_path).exists():
         print("ImageNet path not provided or doesn't exist.")
@@ -103,7 +115,7 @@ def process_imagenet(imagenet_path, output_dir, n_samples=200000):
     print("Processing ImageNet dataset...")
     
     # Process images from directory
-    all_images = process_images_from_directory(imagenet_path, n_samples)
+    all_images, sampled_files = process_images_from_directory(imagenet_path, n_samples)
     
     if len(all_images) == 0:
         print("No images were successfully processed from ImageNet")
@@ -134,8 +146,17 @@ def process_imagenet(imagenet_path, output_dir, n_samples=200000):
         f.attrs['n_train'] = n_train
         f.attrs['n_valid'] = n_valid
         f.attrs['image_shape'] = train_images.shape[1:]
-    
     print(f"ImageNet processed and saved to: {output_path}")
+
+    # Table of info
+    df = pandas.DataFrame()
+    df['base_files'] = np.array(sampled_files)[indices[:n_train + n_valid]]
+    if debug:
+        embed(header='Debugging Image Processing 153')
+    tbl_file = output_path.with_suffix('.csv')
+    df.to_csv(tbl_file, index=False)
+    print(f"Metadata table saved to: {tbl_file}")
+    
     return output_path
 
 def verify_hdf5_file(filepath):
@@ -158,10 +179,10 @@ def verify_hdf5_file(filepath):
 
 def main():
     parser = argparse.ArgumentParser(description='Process ImageNet datasets')
-    parser.add_argument('--data-dir', default='./data', help='Directory to store raw data')
-    parser.add_argument('--output-dir', default='./processed', help='Directory to store processed data')
-    parser.add_argument('--imagenet-path', default='./imagenet_dataset', help='Path to ImageNet dataset directory')
-    parser.add_argument('--n-samples', type=int, default=200000, help='Number of samples to process')
+    parser.add_argument('--data_dir', default='./data', help='Directory to store raw data')
+    parser.add_argument('--output_dir', default='./processed', help='Directory to store processed data')
+    parser.add_argument('--imagenet_path', default='./imagenet_dataset', help='Path to ImageNet dataset directory')
+    parser.add_argument('--n_samples', type=int, default=200000, help='Number of samples to process')
     parser.add_argument('--seed', type=int, default=0, help='Random seed for reproducibility')
     
     args = parser.parse_args()
@@ -185,13 +206,10 @@ def main():
     processed_files = []
     
     # Process ImageNet
-    try:
-        imagenet_file = process_imagenet(args.imagenet_path, args.output_dir, args.n_samples)
-        if imagenet_file:
-            processed_files.append(imagenet_file)
-            verify_hdf5_file(imagenet_file)
-    except Exception as e:
-        print(f"Error processing ImageNet: {e}")
+    imagenet_file = process_imagenet(args.imagenet_path, args.output_dir, args.n_samples)
+    if imagenet_file:
+        processed_files.append(imagenet_file)
+        verify_hdf5_file(imagenet_file)
     
     print("\n" + "=" * 50)
     print("PROCESSING COMPLETE")
@@ -213,3 +231,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+    ## Example usage:
+# python imagenet_preprocess.py --imagenet_path /mnt/tank/Oceanography/data/Natural/ImageNet/ILSVRC/Data/CLS-LOC/train --output_dir ./processed --n_samples 200000

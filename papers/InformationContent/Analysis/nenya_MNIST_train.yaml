@@ -39,16 +39,11 @@ spec:
         command: ["/bin/bash", "-c"]
             #command: ["sh", "-c", "sleep infinity"]
         args:
-          - git clone https://github.com/Sea-Meets-the-Stars/wrangler.git;
+          - sleep 300;
+            git clone https://github.com/Sea-Meets-the-Stars/wrangler.git;
             cd wrangler;
             git fetch;
             git checkout nasa_ai;
-            git pull;
-            pip install -e ".[dev]";
-            cd ..;
-            git clone https://github.com/Sea-Meets-the-Stars/remote_sensing.git;
-            cd remote_sensing;
-            git fetch;
             git pull;
             pip install -e ".[dev]";
             cd ../nenya; 

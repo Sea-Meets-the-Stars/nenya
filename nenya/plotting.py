@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 import matplotlib.gridspec as gridspec
 import seaborn as sns
 
-from remote_sensing.plotting import utils as plotting
+#from remote_sensing.plotting import utils as plotting
 from wrangler import s3_io
 
 from nenya import io as nenya_io
@@ -49,7 +49,6 @@ def learn_curve(valid_losses_file:str, train_losses_file:str,
                 ax=None, ylog:bool=False, outfile:str='fig_learn_curve.png'):
 
     # Grab the data
-    #embed(header='17 of plotting')
     with s3_io.open(valid_losses_file, 'rb') as f:
         valid_hf = h5py.File(f, 'r')
         loss_valid = valid_hf['loss_valid'][:]
@@ -78,7 +77,7 @@ def learn_curve(valid_losses_file:str, train_losses_file:str,
     if ylog:
         ax.set_yscale('log')
 
-    plotting.set_fontsize(ax, 21.)
+    set_fontsize(ax, 21.)
     
     if outfile is not None:
         plt.tight_layout()
@@ -171,7 +170,6 @@ def umap_gallery(
         tbl = tbl.iloc[idx].copy()
 
     # Fig
-    #_, cm = plotting.load_palette()
     fsz = 15.
     if annotate or skip_incidence:
         fsize = (9,8)
@@ -280,7 +278,7 @@ def umap_gallery(
         if ndone > nmax:
             break
 
-    plotting.set_fontsize(ax_gallery, fsz)
+    set_fontsize(ax_gallery, fsz)
     #ax.set_aspect('equal', 'datalim')
     #ax.set_aspect('equal')#, 'datalim')
 
@@ -321,3 +319,20 @@ def umap_gallery(
     plt.savefig(outfile, dpi=300)
     plt.close()
     print('Wrote {:s}'.format(outfile))
+
+
+def set_fontsize(ax, fsz):
+    """
+    Set the fontsize throughout an Axis
+
+    Args:
+        ax (Matplotlib Axis):
+        fsz (float): Font size
+
+    Returns:
+
+    """
+    for item in ([ax.title, ax.xaxis.label, ax.yaxis.label] +
+                 ax.get_xticklabels() + ax.get_yticklabels()):
+        item.set_fontsize(fsz)
+

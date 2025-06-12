@@ -11,6 +11,8 @@ __pycache__/
 
 # Data
 *.npz
+*.gz
+*ubyte
 
 # Distribution / packaging
 .Python

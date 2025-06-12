@@ -14,6 +14,35 @@ from nenya import io as nenya_io
 
 from IPython import embed
 
+def closest_latents(images:list, similarities:np.ndarray, output_png:str='closest_latents.png'):
+
+    # --- Shared color scale for all plots ---
+    all_data = np.array(images)
+    vmin = np.min(all_data)
+    vmax = np.max(all_data)
+
+    nimgs = all_data.shape[0]
+
+    # --- Plot using pcolor ---
+    plt.figure(figsize=(3 *nimgs, 3))
+
+    for ss in range(nimgs):
+        arr = images[ss]
+
+        plt.subplot(1, nimgs, ss + 1)
+        plt.pcolor(arr, cmap="viridis", vmin=vmin, vmax=vmax)
+        plt.axis("off")
+        plt.gca().set_aspect("auto")
+
+        if ss == 0:
+            plt.title("Query")
+        else:
+            plt.title(f"Sim: {similarities[ss]:.2f}")
+
+    plt.tight_layout()
+    plt.savefig(output_png, dpi=300)
+    print(f"✅ Saved plot with pcolor to: {output_png}")
+
 
 def learn_curve(valid_losses_file:str, train_losses_file:str, 
                 ax=None, ylog:bool=False, outfile:str='fig_learn_curve.png'):

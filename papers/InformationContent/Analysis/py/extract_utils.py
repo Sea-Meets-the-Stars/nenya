@@ -10,6 +10,7 @@ from concurrent.futures import ProcessPoolExecutor
 from tqdm import tqdm
 
 from wrangler.preproc import field as pp_field
+from wrangler.plotting import cutout as plot_cutout
 from nenya import io as nenya_io
 
 from IPython import embed
@@ -73,6 +74,7 @@ def prep_for_training(tbl_file:str,
             sub_fields[kk] = fields[idx]
         del fields
 
+        '''
         # Inpaint
         print("Inpainting..")
         inpainted = f['inpainted_masks'][:]
@@ -80,6 +82,7 @@ def prep_for_training(tbl_file:str,
             fill = np.isfinite(inpainted[idx])
             sub_fields[kk][fill] = inpainted[idx][fill]
         del inpainted
+        '''
 
         # Preprocess?
         if poptions is not None:

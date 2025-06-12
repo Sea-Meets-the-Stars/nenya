@@ -1,4 +1,4 @@
-""" Run Nenya on the N21 dataset """
+""" Run Nenya on the ImageNet dataset """
 
 from importlib import reload
 import os
@@ -59,7 +59,7 @@ def chk_latents(query_idx:int, partition:str='train', top_N:int=5):
 def train():
     # Train the model
     #train_main("opts_nenya_modis.json", debug=False)
-    train_main("opts_nenya_modis.json", debug=False, load_epoch=23)
+    train_main("opts_nenya_imagenet.json", debug=False, load_epoch=23)
 
 # Command line execution
 if __name__ == '__main__':

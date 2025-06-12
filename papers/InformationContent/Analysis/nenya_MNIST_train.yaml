@@ -39,8 +39,7 @@ spec:
         command: ["/bin/bash", "-c"]
             #command: ["sh", "-c", "sleep infinity"]
         args:
-          - sleep 300;
-            git clone https://github.com/Sea-Meets-the-Stars/wrangler.git;
+          - git clone https://github.com/Sea-Meets-the-Stars/wrangler.git;
             cd wrangler;
             git fetch;
             git checkout nasa_ai;

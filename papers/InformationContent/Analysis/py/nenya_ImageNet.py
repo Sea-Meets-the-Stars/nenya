@@ -54,14 +54,32 @@ def train():
     # Train the model
     train_main("opts_nenya_imagenet.json", debug=False)#, load_epoch=23)
 
+def main(task:str):
+    if task == 'train':
+        train()
+    elif task == 'evaluate':
+        evaluate()
+    elif task == 'chk_latents':
+        chk_latents(100)
+    else:
+        raise ValueError(f"Unknown task: {task}")
+
 # Command line execution
 if __name__ == '__main__':
+    import sys
 
-    # Train
-    #train()
+    if len(sys.argv) == 1:
+        print("Usage: python nenya_ImageNet.py <task>")
+        print("Tasks: train, evaluate, chk_latents")
+    elif len(sys.argv) > 2:
+        print("Too many arguments. Only one task is allowed.")
+        sys.exit(1)
+    elif len(sys.argv) == 2:
+        task = sys.argv[1].lower()
+        if task not in ['train', 'evaluate', 'chk_latents']:
+            print(f"Unknown task: {task}. Use 'train', 'evaluate', or 'chk_latents'.")
+            sys.exit(1)
+        print(f"Running task: {task}")
+        task = sys.argv[1].lower()
 
-    # Evaluate
-    #evaluate()
-
-    # Check
-    chk_latents(100)
+    main(task)

@@ -4,12 +4,9 @@ from importlib import reload
 import os
 import shutil
 
-import h5py
 
-from nenya.train import main as train_main
-from nenya import latents_extraction
-from nenya import analysis
-from nenya import plotting
+import nenya_utils
+
 
 if 'OS_SST' in os.environ:
     modis_path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Info')
@@ -19,41 +16,6 @@ if 'OS_SST' in os.environ:
                         'train_MODIS_2021_128x128_latents.h5')
 
 from IPython import embed
-
-def evaluate():
-    # Evaluate the model for MODIS native
-    latents_extraction.evaluate("opts_nenya_modis.json", 
-                os.path.join(modis_path, 'PreProc', 'train_MODIS_2021_128x128.h5'),
-                local_model_path=modis_path,
-                use_gpu=False,
-                debug=False, clobber=True)
-
-def chk_latents(query_idx:int, partition:str='train', top_N:int=5):
-
-    # Grab the latents
-    with h5py.File(latents_file, 'r') as f:
-        latents = f[partition][:]
-        print(f"Latents shape: {latents.shape}")
-
-
-    # Closest
-    closest_idx, similarities = analysis.find_closest_latents(latents, query_idx)
-
-    # Grab the images
-    with h5py.File(preproc_file, 'r') as f:
-        images = [f[partition][idx] for idx in [query_idx]+closest_idx[:top_N].tolist()]
-        print(f"Grabbed {len(images)} images for plotting including the query.")
-
-    # Plot
-    embed(header='53 of nenya')
-    reload(plotting)
-    plotting.closest_latents(images,  similarities,
-                          output_png=f'nenya_MODIS_{partition}_chk_latents_{query_idx}.png')
-
-
-def train():
-    # Train the model
-    train_main("opts_nenya_imagenet.json", debug=False)#, load_epoch=23)
 
 def main(task:str):
     if task == 'train':
@@ -67,20 +29,5 @@ def main(task:str):
 
 # Command line execution
 if __name__ == '__main__':
-    import sys
-
-    if len(sys.argv) == 1:
-        print("Usage: python nenya_ImageNet.py <task>")
-        print("Tasks: train, evaluate, chk_latents")
-    elif len(sys.argv) > 2:
-        print("Too many arguments. Only one task is allowed.")
-        sys.exit(1)
-    elif len(sys.argv) == 2:
-        task = sys.argv[1].lower()
-        if task not in ['train', 'evaluate', 'chk_latents']:
-            print(f"Unknown task: {task}. Use 'train', 'evaluate', or 'chk_latents'.")
-            sys.exit(1)
-        print(f"Running task: {task}")
-        task = sys.argv[1].lower()
-
+    task = nenya_utils.return_task()
     main(task)

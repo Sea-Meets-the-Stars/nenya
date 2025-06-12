@@ -14,19 +14,20 @@ from nenya import io as nenya_io
 
 from IPython import embed
 
-def closest_latents(images:list, similarities:np.ndarray, output_png:str='closest_latents.png'):
+def closest_latents(images:list, indices:list, similarities:np.ndarray, 
+                    output_png:str='closest_latents.png'):
 
     # --- Shared color scale for all plots ---
     all_data = np.array(images)
     vmin = np.min(all_data)
     vmax = np.max(all_data)
 
-    nimgs = all_data.shape[0]
+    nimgs = len(indices)
 
     # --- Plot using pcolor ---
     plt.figure(figsize=(3 *nimgs, 3))
 
-    for ss in range(nimgs):
+    for ss, idx in enumerate(indices):
         arr = images[ss]
 
         plt.subplot(1, nimgs, ss + 1)
@@ -35,9 +36,9 @@ def closest_latents(images:list, similarities:np.ndarray, output_png:str='closes
         plt.gca().set_aspect("auto")
 
         if ss == 0:
-            plt.title("Query")
+            plt.title(f"Query: idx={idx}")
         else:
-            plt.title(f"Sim: {similarities[ss]:.2f}")
+            plt.title(f"Sim: idx={idx}, {similarities[ss]:.2f}")
 
     plt.tight_layout()
     plt.savefig(output_png, dpi=300)

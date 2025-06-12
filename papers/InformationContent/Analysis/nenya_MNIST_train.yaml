@@ -53,7 +53,7 @@ spec:
             pip install -e ".[dev]";
             cd papers/InformationContent/Analysis;
             aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp s3://modis-l2/PreProc/mnist_resampled.h5 ./;
-            python -u py/nenya_MNIST.py;
+            python -u py/nenya_MNIST.py train;
             aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp models s3://viirs/Nenya/models --recursive --force;
         env:
           - name: "ENDPOINT_URL"

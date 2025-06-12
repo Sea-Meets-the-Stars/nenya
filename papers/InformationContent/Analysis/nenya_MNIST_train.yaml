@@ -45,7 +45,13 @@ spec:
             git checkout nasa_ai;
             git pull;
             pip install -e ".[dev]";
-            cd nenya; 
+            cd ..;
+            git clone https://github.com/Sea-Meets-the-Stars/remote_sensing.git;
+            cd remote_sensing;
+            git fetch;
+            git pull;
+            pip install -e ".[dev]";
+            cd ../nenya; 
             git fetch;
             git checkout swot; 
             git pull; 

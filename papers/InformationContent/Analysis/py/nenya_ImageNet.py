@@ -11,9 +11,10 @@ from nenya import latents_extraction
 from nenya import analysis
 from nenya import plotting
 
-modis_path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Info')
-preproc_file = os.path.join(modis_path, 'PreProc', 'train_MODIS_2021_128x128.h5')
-latents_file = os.path.join(modis_path, 'latents', 'MODIS_2021',
+if 'OS_SST' in os.environ:
+    modis_path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Info')
+    preproc_file = os.path.join(modis_path, 'PreProc', 'train_MODIS_2021_128x128.h5')
+    latents_file = os.path.join(modis_path, 'latents', 'MODIS_2021',
                         'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm',
                         'train_MODIS_2021_128x128_latents.h5')
 

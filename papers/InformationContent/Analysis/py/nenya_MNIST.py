@@ -11,22 +11,18 @@ if 'OS_DATA' in os.environ:
     latents_file = os.path.join(mnist_path, 'latents', 
                         'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm',
                         'mnist_resampled_latents.h5')
+opts_file = 'opts_nenya_mnist.json'
 
-def evaluate():
-    # Evaluate the model for MNIST
-    latents_extraction.evaluate("opts_nenya_mnist.json", 
-                os.path.join(mnist_path,'mnist_resampled.h5'), 
-                local_model_path=mnist_path,
-                debug=False, clobber=True)
-
-def train():
-
-    # Train the model
-    train_main("opts_nenya_mnist.json", debug=False)
+#def evaluate():
+#    # Evaluate the model for MNIST
+#    latents_extraction.evaluate("opts_nenya_mnist.json", 
+#                os.path.join(mnist_path,'mnist_resampled.h5'), 
+#                local_model_path=mnist_path,
+#                debug=False, clobber=True)
 
 def main(task:str):
     if task == 'train':
-        nenya_utils.train("opts_nenya_mnist.json", debug=False)
+        nenya_utils.train(opts_file, debug=False)
     elif task == 'evaluate':
         nenya_utils.evaluate()
     elif task == 'chk_latents':

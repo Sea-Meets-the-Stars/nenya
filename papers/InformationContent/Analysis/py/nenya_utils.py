@@ -11,11 +11,11 @@ from nenya import plotting
 
 from IPython import embed
 
-def evaluate(opts_file:str):
+def evaluate(opts_file:str, prepcroc_file:str, local_path:str=None):
     # Evaluate the model for MODIS native
     latents_extraction.evaluate(opts_file,
-                os.path.join(modis_path, 'PreProc', 'train_MODIS_2021_128x128.h5'),
-                local_model_path=modis_path,
+                preproc_file,
+                local_model_path=local_path,
                 use_gpu=False,
                 debug=False, clobber=True)
 

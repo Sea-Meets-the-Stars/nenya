@@ -11,9 +11,13 @@ from nenya import latents_extraction
 from nenya import analysis
 from nenya import plotting
 
-modis_path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Info')
-preproc_file = os.path.join(modis_path, 'PreProc', 'train_MODIS_2021_128x128.h5')
-latents_file = os.path.join(modis_path, 'latents', 'MODIS_2021',
+
+opts_file = 'opts_nenya_modis.json'
+
+if 'OS_SST' in os.environ:
+    modis_path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Info')
+    preproc_file = os.path.join(modis_path, 'PreProc', 'train_MODIS_2021_128x128.h5')
+    latents_file = os.path.join(modis_path, 'latents', 'MODIS_2021',
                         'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm',
                         'train_MODIS_2021_128x128_latents.h5')
 
@@ -56,19 +60,18 @@ def chk_latents(query_idx:int, partition:str='train', top_N:int=5):
                           output_png=f'nenya_MODIS_{partition}_chk_latents_{query_idx}.png')
 
 
-def train():
-    # Train the model
-    #train_main("opts_nenya_modis.json", debug=False)
-    train_main("opts_nenya_modis.json", debug=False, load_epoch=23)
+
+def main(task:str):
+    if task == 'train':
+        nenya_utils.train(opts_file, debug=False)
+    elif task == 'evaluate':
+        nenya_utils.evaluate(opts_file, preproc_file, modis_path)
+    elif task == 'chk_latents':
+        nenya_utils.chk_latents('MNIST', latents_file, preproc_file, 100)
+    else:
+        raise ValueError(f"Unknown task: {task}")
 
 # Command line execution
 if __name__ == '__main__':
-
-    # Train
-    #train()
-
-    # Evaluate
-    #evaluate()
-
-    # Check
-    chk_latents(100)
+    task = nenya_utils.return_task()
+    main(task)

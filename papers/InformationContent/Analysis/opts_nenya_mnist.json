@@ -31,6 +31,7 @@
     "local_outdir": "s3://modis-l2/Nenya/",
     "trial": 5,
     "nchannels": 1,
+    "random_cropjitter": [22, 3],
     "gauss_noise": 0.00,
     "flip": true,
     "rotate": true,

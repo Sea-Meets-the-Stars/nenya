@@ -67,8 +67,6 @@ spec:
             mountPath: "/tmp"
           - name: "dshm"
             mountPath: "/dev/shm"
-      nodeSelector:
-        nautilus.io/disktype: nvme
       restartPolicy: Never
       volumes:
         # Secrets file for nautilus s3 credentials .aws/credentials and .s3cfg

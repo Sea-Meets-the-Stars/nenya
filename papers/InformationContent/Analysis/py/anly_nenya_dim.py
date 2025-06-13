@@ -17,11 +17,8 @@ def pca_latents(dataset:str):
                         'Nenya', 'latents/MODIS_R2019_v4_REDO',
                         'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_256_temp_0.07_trial_5_cosine_warm')
     if dataset == 'MODIS_SST_2km_sub':
-        filename = 'MODIS_R2019_2004_95clear_128x128_latents_std.h5'
-        outfile='pca_latents_MODIS_SST_2km.npz'
-        path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2',
-                        'Nenya', 'latents/MODIS_R2019_v4_REDO',
-                        'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_256_temp_0.07_trial_5_cosine_warm')
+        outfile='pca_latents_MODIS_SST_2km_sub.npz'
+        Nmax = 200000
     elif dataset == 'MODIS_SST':
         outfile='pca_latents_MODIS_SST.npz'
         path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2',
@@ -54,6 +51,7 @@ def pca_latents(dataset:str):
 if __name__ == '__main__':
     # PCA MODIS SST
     #pca_latents('MODIS_SST_2km')
+    pca_latents('MODIS_SST_2km_sub')
     #pca_latents('MODIS_SST')
 
     #  VIIRS SST
@@ -63,4 +61,4 @@ if __name__ == '__main__':
     #pca_latents('LLC_SST')
 
     # MNIST
-    pca_latents('MNIST')
+    #pca_latents('MNIST')

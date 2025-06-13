@@ -64,7 +64,8 @@ def fig_pca(outfile:str='fig_pca_variance.png',
 
     # Load PCAs
     ds = []
-    datasets = ['MODIS_SST', 'MODIS_SST_2km', 'VIIRS_SST_2km', 
+    datasets = ['MODIS_SST', 'MODIS_SST_2km', #'MODIS_SST_2km_sub',
+                'VIIRS_SST_2km', 
                 'LLC_SST', 
                 #'SWOT_SSR', 
                 'MNIST']
@@ -76,10 +77,14 @@ def fig_pca(outfile:str='fig_pca_variance.png',
         else:
             clr = cdict[dataset]
         
-        d = np.load(f'../Analysis/pca_latents_{dataset}.npz')
+        pca_file = f'../Analysis/pca_latents_{dataset}.npz'
+        print(f"Loading PCA file: {pca_file}")
+        d = np.load(pca_file)
         ds.append(d)
         #
         clrs.append(clr)
+
+    embed(header='PCA Variance Explained 89')
 
     # 
     fig = plt.figure(figsize=(8,6))
@@ -87,7 +92,12 @@ def fig_pca(outfile:str='fig_pca_variance.png',
 
     ax = plt.subplot(gs[0])
     for ss, d in enumerate(ds):
-        ls = ':' if '2km' in datasets[ss] else '-'
+        if 'sub' in datasets[ss]:
+            ls = '--' 
+        elif '2km' in datasets[ss]:
+            ls = ':' 
+        else:
+            ls = '-'
         ax.plot(np.arange(d['explained_variance'].size)+1, 
                 d['explained_variance'], label=datasets[ss].replace('_','/'),
                 color=clrs[ss], ls=ls)

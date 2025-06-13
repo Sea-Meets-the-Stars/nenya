@@ -7,6 +7,7 @@ from sklearn import decomposition
 
 def fit_latents(latents_file:str, 
                 outfile:str,  
+                Nmax:int=None,
                 key:str=None):
     """ Fit PCA to latents file
     Args:
@@ -27,6 +28,13 @@ def fit_latents(latents_file:str,
         latents.append(f[key][:])
     latents = np.concatenate(latents, axis=0)
     f.close()
+
+    # Chop down?
+    if Nmax is not None:
+        if Nmax > latents.shape[0]:
+            raise ValueError(f"Nmax ({Nmax}) is larger than the number of samples ({latents.shape[0]})")
+        print(f"Chopping down to {Nmax} samples")
+        latents = latents[:Nmax, ...]
 
     # PCA
     print(f"Fitting PCA on {latents.shape[0]} samples with {latents.shape[1]} features")

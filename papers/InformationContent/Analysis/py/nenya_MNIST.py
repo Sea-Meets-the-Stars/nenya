@@ -4,9 +4,11 @@ import os
 
 from nenya import workflow
 
+import info_defs
 
 
 def main(task:str):
+    opts_file, mnist_path, preproc_file, latents_file = info_defs.grab_paths('MNIST')
     if task == 'train':
         workflow.train(opts_file, debug=False)
     elif task == 'evaluate':

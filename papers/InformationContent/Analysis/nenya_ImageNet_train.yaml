@@ -28,14 +28,14 @@ spec:
         imagePullPolicy: Always
         resources:
           requests:
-            cpu: "16"   # Using ~3
-            memory: "24Gi"  # Using 4 and climbing..
+            cpu: "5"   # Using ~4
+            memory: "24Gi"  # Using 
             ephemeral-storage: 50Gi
           limits:
             cpu: "16"
             memory: "32Gi"
             ephemeral-storage: 100Gi
-            nvidia.com/gpu:  "4"  # Holding at ~60% usage..
+            nvidia.com/gpu:  "8"  # 
         command: ["/bin/bash", "-c"]
             #command: ["sh", "-c", "sleep infinity"]
         args:
@@ -52,7 +52,7 @@ spec:
             pip install -e ".[dev]";
             cd papers/InformationContent/Analysis;
             aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp s3://modis-l2/PreProc/train_MODIS_2021_128x128.h5 ./;
-            python -u py/nenya_MODIS.py train;
+            python -u py/nenya_ImageNet.py train;
             aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp models s3://viirs/Nenya/models --recursive --force;
         env:
           - name: "ENDPOINT_URL"

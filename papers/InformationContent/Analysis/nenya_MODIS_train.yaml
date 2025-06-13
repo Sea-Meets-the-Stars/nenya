@@ -51,7 +51,7 @@ spec:
             git pull; 
             pip install -e ".[dev]";
             cd papers/InformationContent/Analysis;
-            aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp s3://modis-l2/PreProc/mnist_resampled.h5 ./;
+            aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp s3://modis-l2/PreProc/train_MODIS_2021_128x128.h5 ./;
             python -u py/nenya_MODIS.py train;
             aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp models s3://viirs/Nenya/models --recursive --force;
         env:

@@ -13,18 +13,11 @@ if 'OS_DATA' in os.environ:
                         'mnist_resampled_latents.h5')
 opts_file = 'opts_nenya_mnist.json'
 
-#def evaluate():
-#    # Evaluate the model for MNIST
-#    latents_extraction.evaluate("opts_nenya_mnist.json", 
-#                os.path.join(mnist_path,'mnist_resampled.h5'), 
-#                local_model_path=mnist_path,
-#                debug=False, clobber=True)
-
 def main(task:str):
     if task == 'train':
         workflow.train(opts_file, debug=False)
     elif task == 'evaluate':
-        workflow.evaluate()
+        workflow.evaluate(opts_file, preproc_file, local_model_path=mnist_path) 
     elif task == 'chk_latents':
         workflow.chk_latents('MNIST', latents_file, preproc_file, 100)
     else:

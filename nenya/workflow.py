@@ -11,11 +11,21 @@ from nenya import plotting
 
 from IPython import embed
 
-def evaluate(opts_file:str, prepcroc_file:str, local_path:str=None):
-    # Evaluate the model for MODIS native
+def evaluate(opts_file:str, preproc_file:str, local_model_path:str=None):
+    """
+    Evaluate the latents extraction process using the specified options and preprocessing files.
+
+    Args:
+        opts_file (str): Path to the options file containing configuration settings.
+        preproc_file (str): Path to the preprocessing file required for evaluation.
+        local_model_path (str, optional): Path to the local model file. Defaults to None.
+
+    Returns:
+        None: This function does not return a value. It performs evaluation and may modify files or output logs.
+    """
     latents_extraction.evaluate(opts_file,
                 preproc_file,
-                local_model_path=local_path,
+                local_model_path=local_model_path,
                 use_gpu=False,
                 debug=False, clobber=True)
 

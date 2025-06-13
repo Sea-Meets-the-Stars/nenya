@@ -4,7 +4,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: xavier-nenya-modis-v1-train
+  name: xavier-nenya-imagenet-v1-train
 spec:
   backoffLimit: 0
   template:

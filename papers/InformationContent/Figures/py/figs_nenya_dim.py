@@ -84,7 +84,7 @@ def fig_pca(outfile:str='fig_pca_variance.png',
         #
         clrs.append(clr)
 
-    embed(header='PCA Variance Explained 89')
+    #embed(header='PCA Variance Explained 89')
 
     # 
     fig = plt.figure(figsize=(8,6))

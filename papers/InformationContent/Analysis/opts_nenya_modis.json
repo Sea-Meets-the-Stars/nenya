@@ -13,7 +13,7 @@
     "temp": 0.07,
     "cosine": true,
     "syncBN": false,
-    "feat_dim": 200,
+    "feat_dim": 256,
     "weight_decay": 1e-4,
     "momentum": 0.9,
     "ssl_method": "SimCLR",

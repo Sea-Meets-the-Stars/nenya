@@ -10,6 +10,7 @@ from nenya.train import main as train_main
 from nenya import latents_extraction
 from nenya import analysis
 from nenya import plotting
+from nenya import workflow
 
 
 opts_file = 'opts_nenya_modis.json'
@@ -63,11 +64,11 @@ def chk_latents(query_idx:int, partition:str='train', top_N:int=5):
 
 def main(task:str):
     if task == 'train':
-        nenya_utils.train(opts_file, debug=False)
+        workflow.train(opts_file, debug=False)
     elif task == 'evaluate':
-        nenya_utils.evaluate(opts_file, preproc_file, modis_path)
+        workflow.evaluate(opts_file, preproc_file, modis_path)
     elif task == 'chk_latents':
-        nenya_utils.chk_latents('MNIST', latents_file, preproc_file, 100)
+        workflow.chk_latents('MODIS', latents_file, preproc_file, 100)
     else:
         raise ValueError(f"Unknown task: {task}")
 

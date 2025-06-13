@@ -74,5 +74,5 @@ def main(task:str):
 
 # Command line execution
 if __name__ == '__main__':
-    task = nenya_utils.return_task()
+    task = workflow.return_task()
     main(task)

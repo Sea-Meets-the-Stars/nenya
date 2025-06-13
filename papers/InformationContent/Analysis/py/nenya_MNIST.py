@@ -2,7 +2,7 @@
 
 import os
 
-import nenya_utils
+from nenya import workflow
 
 
 if 'OS_DATA' in os.environ:
@@ -22,15 +22,15 @@ opts_file = 'opts_nenya_mnist.json'
 
 def main(task:str):
     if task == 'train':
-        nenya_utils.train(opts_file, debug=False)
+        workflow.train(opts_file, debug=False)
     elif task == 'evaluate':
-        nenya_utils.evaluate()
+        workflow.evaluate()
     elif task == 'chk_latents':
-        nenya_utils.chk_latents('MNIST', latents_file, preproc_file, 100)
+        workflow.chk_latents('MNIST', latents_file, preproc_file, 100)
     else:
         raise ValueError(f"Unknown task: {task}")
 
 # Command line execution
 if __name__ == '__main__':
-    task = nenya_utils.return_task()
+    task = workflow.return_task()
     main(task)

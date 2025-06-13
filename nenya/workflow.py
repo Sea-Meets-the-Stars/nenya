@@ -11,7 +11,8 @@ from nenya import plotting
 
 from IPython import embed
 
-def evaluate(opts_file:str, preproc_file:str, local_model_path:str=None):
+def evaluate(opts_file:str, preproc_file:str, latents_file:str=None,
+             local_model_path:str=None, use_gpu:bool=False, clobber:bool=False):
     """
     Evaluate the latents extraction process using the specified options and preprocessing files.
 
@@ -19,6 +20,9 @@ def evaluate(opts_file:str, preproc_file:str, local_model_path:str=None):
         opts_file (str): Path to the options file containing configuration settings.
         preproc_file (str): Path to the preprocessing file required for evaluation.
         local_model_path (str, optional): Path to the local model file. Defaults to None.
+        latents_file (str, optional): Path to the file where latents will be stored. Defaults to None.
+        clobber (bool, optional): If True, overwrite existing latents file. Defaults to False.
+        use_gpu (bool, optional): Flag indicating whether to use GPU for evaluation. Defaults to False.
 
     Returns:
         None: This function does not return a value. It performs evaluation and may modify files or output logs.
@@ -26,8 +30,9 @@ def evaluate(opts_file:str, preproc_file:str, local_model_path:str=None):
     latents_extraction.evaluate(opts_file,
                 preproc_file,
                 local_model_path=local_model_path,
-                use_gpu=False,
-                debug=False, clobber=True)
+                latents_file=latents_file,
+                use_gpu=use_gpu,
+                debug=False, clobber=clobber)
 
 def chk_latents(dataset:str, latents_file:str, preproc_file:str,
                 query_idx:int, partition:str='train', top_N:int=5):

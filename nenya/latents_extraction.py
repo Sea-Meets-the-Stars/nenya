@@ -63,7 +63,7 @@ class HDF5RGBDataset(torch.utils.data.Dataset):
 
 
 def evaluate(opt_path, pp_file:str, debug=False, clobber=False,
-             use_gpu:bool=None,
+             use_gpu:bool=None, latents_file:str=None,
              local_model_path:str=None, model_name:str='last.pth'): 
     """
     This function is used to obtain the latents of the trained model
@@ -80,12 +80,16 @@ def evaluate(opt_path, pp_file:str, debug=False, clobber=False,
         local_model_path: (str, optional)
             If provided, the model will be loaded from this path.
             Otherwise, it will be downloaded from S3.
+        latents_file: (str, optional)
+            If provided, the latents will be saved to this file.
+            Otherwise, it will be saved to pp_file.replace('.h5', '_latents.h5').
         model_name: (str) model name 
         clobber: (bool, optional)
             If true, over-write any existing file
     """
     # Setup
-    latents_file = pp_file.replace('.h5', '_latents.h5')
+    if latents_file is None:
+        latents_file = pp_file.replace('.h5', '_latents.h5')
     if os.path.isfile(latents_file) and not clobber:
         print(f"Latents file {latents_file} already exists. Skipping extraction.")
         return
@@ -123,6 +127,7 @@ def evaluate(opt_path, pp_file:str, debug=False, clobber=False,
     for partition in latent_dict.keys():
         latents_hf.create_dataset(partition, data=latent_dict[partition])
     latents_hf.close()
+    print(f"Latents saved to {latents_file}")
 
 
 '''

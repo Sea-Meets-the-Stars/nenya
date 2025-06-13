@@ -2,11 +2,13 @@
 import os
 
 from nenya.pca import fit_latents
+import info_defs
 
 def pca_latents(dataset:str):
 
     # Load
     key = 'valid'
+    opts_file, path, preproc_file, latents_file = info_defs.grab_paths(dataset)
     if dataset == 'MODIS_SST_2km':
         filename = 'MODIS_R2019_2004_95clear_128x128_latents_std.h5'
         outfile='pca_latents_MODIS_SST_2km.npz'
@@ -33,23 +35,19 @@ def pca_latents(dataset:str):
                         'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_256_temp_0.07_trial_5_cosine_warm') 
         key = None
     elif dataset == 'MNIST':
-        mnist_path = os.getenv('OS_DATA')
-        mnist_path = os.path.join(mnist_path, 'Natural', 'MNIST', 'Info')
-        path = mnist_path
-        filename = 'mnist_resampled_latents.h5'
         outfile='pca_latents_MNIST.npz'
         key = None
     else:
         raise IOError("Bad dataset: {}".format(dataset))
 
-    fit_latents(os.path.join(path, filename), outfile, key=key)
+    fit_latents(latents_file, outfile, key=key)
 
 
 # Command line execution
 if __name__ == '__main__':
     # PCA MODIS SST
     #pca_latents('MODIS_SST_2km')
-    pca_latents('MODIS_SST')
+    #pca_latents('MODIS_SST')
 
     #  VIIRS SST
     #pca_latents('VIIRS_SST')
@@ -58,4 +56,4 @@ if __name__ == '__main__':
     #pca_latents('LLC_SST')
 
     # MNIST
-    #pca_latents('MNIST')
+    pca_latents('MNIST')

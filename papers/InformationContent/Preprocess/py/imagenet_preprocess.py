@@ -138,8 +138,8 @@ def process_imagenet(imagenet_path:Path, output_dir:Path, n_samples:int=200000,
     output_path.parent.mkdir(parents=True, exist_ok=True)
     
     with h5py.File(output_path, 'w') as f:
-        f.create_dataset('train', data=train_images, compression='gzip')
-        f.create_dataset('valid', data=valid_images, compression='gzip')
+        f.create_dataset('train', data=train_images)#, compression='gzip')
+        f.create_dataset('valid', data=valid_images)#, compression='gzip')
         
         # Add metadata
         f.attrs['dataset'] = 'ImageNet'

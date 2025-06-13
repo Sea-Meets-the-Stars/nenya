@@ -31,6 +31,11 @@ def grab_paths(dataset:str):
                         'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_256_temp_0.07_trial_5_cosine_warm', 
                         'MODIS_R2019_2004_95clear_128x128_latents_std.h5')
         opts_file = None
+    elif dataset == 'SWOT_L3':
+        if 'OS_SSH' in os.environ:
+            path = os.path.join(os.getenv('OS_SSH'), 'SWOT_L3', 'Info')
+            preproc_file = os.path.join(path, 'PreProc', 'SWOT_L3_250m_preproc.h5')
+        opts_file = 'opts_nenya_swot_l3.json'
     else:
         raise ValueError(f"Dataset {dataset} not supported for Nenya.")
 

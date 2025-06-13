@@ -29,13 +29,13 @@ spec:
         resources:
           requests:
             cpu: "16"   # Using ~3
-            memory: "24Gi"  # Using 4 and climbing..
+            memory: "24Gi"  # Using 5 and climbing..
             ephemeral-storage: 50Gi
           limits:
             cpu: "16"
             memory: "32Gi"
             ephemeral-storage: 100Gi
-            nvidia.com/gpu:  "4"  # Holding at ~60% usage..
+            nvidia.com/gpu:  "4"  # Holding at ~70% usage..
         command: ["/bin/bash", "-c"]
             #command: ["sh", "-c", "sleep infinity"]
         args:

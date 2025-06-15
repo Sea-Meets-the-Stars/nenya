@@ -207,6 +207,37 @@ def fig_swot_umap(outfile:str='fig_swot_umap_gallery.png'):
                                 debug=True,
                                 cmap="Greys",)
 
+def fig_eigenimages(dataset:str, cmap:str, Nimages:int=9, 
+                    outroot:str='fig_eigenmodes'):
+
+    outfile = f'{outroot}_{dataset}.png'
+
+    # Load eigenimages
+    d = np.load(f'../Analysis/{dataset}_eigenimages.npz')
+
+
+    fig = plt.figure(figsize=(6,6))
+    gs = gridspec.GridSpec(3,3)
+
+    for ss in range(Nimages):
+        img = d['eigen_images'][ss][0,...]
+
+        ax = plt.subplot(gs[ss]) 
+        _ = sns.heatmap(np.flipud(img), xticklabels=[], 
+                     #vmin=vmnx[0], vmax=vmnx[1], 
+                     ax=ax,
+                     yticklabels=[], cmap=cmap, cbar=False) 
+                     #cbar_kws={'label': clbl})# 'fontsize': 20})
+        # Title
+        title = f'Eigenmode {ss+1} sim={d["similarities"][ss]:.2f}'
+        ax.set_title(title, fontsize=12)
+
+    #rsp_utils.set_fontsize(ax, 18)
+
+    plt.tight_layout()#pad=0.0, h_pad=0.0, w_pad=0.3)
+    plt.savefig(outfile, dpi=300)
+    print(f"Saved: {outfile}")
+
 def main(flg):
     if flg== 'all':
         flg= np.sum(np.array([2 ** ii for ii in range(25)]))
@@ -220,6 +251,11 @@ def main(flg):
     # PCA variaince
     if flg == 2:
         fig_pca()
+
+    # Eigenmodes
+    if flg == 3:
+        fig_eigenimages('MNIST', 'Greys')
+
 
     # SWOT learning curve
     if flg == 30:

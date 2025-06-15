@@ -19,7 +19,7 @@ def main(task:str):
         workflow.chk_latents(dataset, pdict['latents_file'], pdict['preproc_file'], 100)
     elif task == 'eigenimages':
         workflow.find_eigenmodes(pdict['opts_file'], pdict['pca_file'], 
-                                 (1,28,28), f'{dataset}_eigenmodes.npz',
+                                 (1,28,28), f'{dataset}_eigenimages.npz',
                                  local_model_path=pdict['path'],
                                  num_iterations=10000)
     else:

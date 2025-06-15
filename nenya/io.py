@@ -4,10 +4,12 @@ from importlib import resources
 from io import BytesIO
 
 import pandas
+import torch
 
 from wrangler import s3_io as wr_io
 
 from nenya import params
+from nenya.train_util import set_model
 
 # THIS HACK IS NECESSARY FOR OLDER EXISTING, SERIALIZED MODELS
 #  i.e. DON'T REMOVE IT!
@@ -68,6 +70,53 @@ def load_opt(nenya_model:str):
     # Return
     return opt, nenya_model_file
     
+def load_model_name(opt_path:str, local_model_path:str=None,
+                    base_model_name:str=None):
+
+    # Parse the model
+    opt = params.Params(opt_path)
+    params.option_preprocess(opt)
+
+    # Prep
+
+    # Grab the model?
+    if local_model_path is not None: 
+        model_name = os.path.join(local_model_path,
+            opt.model_folder, base_model_name)
+    elif not os.path.isfile(base_model_name):
+        print(f"Grabbing model: {model_file}")
+        # Download the model from S3
+        s3_model_file = os.path.join(opt.s3_outdir,
+            opt.model_folder, base_model_name)
+        ulmo_io.download_file_from_s3(model_name, s3_model_file)
+    else:
+        print(f"Model was already downloaded: {model_name}")
+
+    return opt, model_name
+
+def load_model(model_path:str, opt, using_gpu:bool,
+               remove_module:bool=True, weights_only:bool=False): 
+    # Specify the model
+    model, _ = set_model(opt, cuda_use=using_gpu)
+
+    # Load model
+    if not using_gpu:
+        model_dict = torch.load(model_path, map_location=torch.device('cpu'), weights_only=weights_only)
+    else:
+        model_dict = torch.load(model_path, weights_only=weights_only)
+
+    # Remove module?
+    if remove_module:
+        new_dict = {}
+        for key in model_dict['model'].keys():
+            new_dict[key.replace('module.','')] = model_dict['model'][key]
+        model.load_state_dict(new_dict)
+    else:
+        model.load_state_dict(model_dict['model'])
+    print("Model loaded")
+
+    return model
+
 
 
 def load_main_table(tbl_file:str, verbose=True):

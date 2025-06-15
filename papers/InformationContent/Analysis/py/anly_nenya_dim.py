@@ -12,12 +12,10 @@ def pca_latents(dataset:str):
     opts_file, path, preproc_file, latents_file = info_defs.grab_paths(dataset)
     if dataset == 'MODIS_SST_2km':
         filename = 'MODIS_R2019_2004_95clear_128x128_latents_std.h5'
-        outfile='pca_latents_MODIS_SST_2km.npz'
         path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2',
                         'Nenya', 'latents/MODIS_R2019_v4_REDO',
                         'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_256_temp_0.07_trial_5_cosine_warm')
     if dataset == 'MODIS_SST_2km_sub':
-        outfile='pca_latents_MODIS_SST_2km_sub.npz'
         Nmax = 200000
     elif dataset == 'MODIS_SST':
         outfile='pca_latents_MODIS_SST.npz'
@@ -39,7 +37,6 @@ def pca_latents(dataset:str):
                         'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_256_temp_0.07_trial_5_cosine_warm') 
         key = None
     elif dataset == 'MNIST':
-        outfile='pca_latents_MNIST.npz'
         key = None
     else:
         raise IOError("Bad dataset: {}".format(dataset))

@@ -13,8 +13,7 @@ from torch.utils.data.dataloader import default_collate
 
 import tqdm
 
-from nenya.train_util import set_model
-from nenya import params 
+from nenya import io as nenya_io
 
 from IPython import embed
 
@@ -64,7 +63,8 @@ class HDF5RGBDataset(torch.utils.data.Dataset):
 
 def evaluate(opt_path, pp_file:str, debug=False, clobber=False,
              use_gpu:bool=None, latents_file:str=None,
-             local_model_path:str=None, model_name:str='last.pth'): 
+             local_model_path:str=None, 
+             base_model_name:str='last.pth'): 
     """
     This function is used to obtain the latents of the trained model
     and write them to disk. It will extract the latents from the
@@ -74,44 +74,41 @@ def evaluate(opt_path, pp_file:str, debug=False, clobber=False,
         opt_path: (str) option file path.
         pp_file: (str) path of the pre-processed file.
         use_gpu: (bool, optional)
-            Passed to model_latents_extract to specify if GPU should be used.
+            If None, will check if CUDA is available and set accordingly.
+            If True, will use GPU for processing.
         debug: (bool, optional)
             If true, run in debug mode (e.g., only a few epochs)
+        remove_module: (bool) If True, remove 'module.' from the keys in the model state dict.
         local_model_path: (str, optional)
             If provided, the model will be loaded from this path.
             Otherwise, it will be downloaded from S3.
         latents_file: (str, optional)
             If provided, the latents will be saved to this file.
             Otherwise, it will be saved to pp_file.replace('.h5', '_latents.h5').
-        model_name: (str) model name 
+        base_model_name: (str) model name 
         clobber: (bool, optional)
             If true, over-write any existing file
     """
-    # Setup
+    if use_gpu is None:
+        use_gpu = torch.cuda.is_available()
+    print("Using GPU: ", use_gpu)
+
+    # Output file
     if latents_file is None:
         latents_file = pp_file.replace('.h5', '_latents.h5')
     if os.path.isfile(latents_file) and not clobber:
         print(f"Latents file {latents_file} already exists. Skipping extraction.")
         return
 
-    # Parse the model
-    opt = params.Params(opt_path)
-    params.option_preprocess(opt)
+    # Model name and opt
+    opt, model_name = nenya_io.load_model_name(
+        opt_path, local_model_path=local_model_path,
+        base_model_name=base_model_name)
 
-    # Prep
-
-    # Grab the model?
-    if local_model_path is not None: 
-        model_name = os.path.join(local_model_path,
-            opt.model_folder, model_name)
-    elif not os.path.isfile(model_name):
-        print(f"Grabbing model: {model_file}")
-        # Download the model from S3
-        s3_model_file = os.path.join(opt.s3_outdir,
-            opt.model_folder, model_name)
-        ulmo_io.download_file_from_s3(model_name, s3_model_file)
-    else:
-        print(f"Model was already downloaded: {model_name}")
+    # Load model
+    model = nenya_io.load_model(model_name, opt, use_gpu,
+                               remove_module=True, 
+                               weights_only=False)
 
     # Do it
     print(f"Working on {pp_file}")
@@ -120,7 +117,7 @@ def evaluate(opt_path, pp_file:str, debug=False, clobber=False,
     # Extract
     print("Extracting latents")
     latent_dict = model_latents_extract(
-        opt, pp_file, model_name, debug=debug, using_gpu=use_gpu)
+        opt, model, pp_file, use_gpu, debug=debug) 
 
     # Save
     latents_hf = h5py.File(latents_file, 'w')
@@ -261,11 +258,8 @@ def prep(opt):
     return model_base, existing_files
 '''
 
-def model_latents_extract(opt, data_file, 
-                          model_path, 
-                          remove_module:bool=True, 
+def model_latents_extract(opt, model, data_file, using_gpu:bool,
                           in_loader=None,
-                          using_gpu:bool=None,
                           partitions:tuple=('train', 'valid'),
                           allowed_indices=None,
                           debug:bool=False):
@@ -275,43 +269,20 @@ def model_latents_extract(opt, data_file,
     
     Args:
         opt: (Parameters) parameters used to create the model.
+        model: (SupConResNet) model class used for latents.
         data_file: (str) path of data_file.
-        model_path: (string) path of the saved model file.
         save_path: (string or None) path for saving the latents.
         partitions: (list) list of keys in the h5py file [e.g. 'train', 'valid'].
         in_loader: (torch.utils.data.DataLoader, optional) Use this DataLoader, if provided
         allowed_indices: (np.ndarray) Set of images that can be grabbed
-        remove_module: (bool) If True, remove 'module.' from the keys in the model state dict.
         debug: (bool) If True, run in debug mode (e.g., only a few batches)
-        using_gpu: (bool, optional)
+        using_gpu: (bool)
             If None, will check if CUDA is available and set accordingly.
 
     Returns:
         latent_dict: (dict) dictionary of latents for each partition.
     """
-    if using_gpu is None:
-        using_gpu = torch.cuda.is_available()
-    print("Using GPU: ", using_gpu)
-
-    # Specify the model
-    model, _ = set_model(opt, cuda_use=using_gpu)
-    #embed(header='model_latents_extract 281')
-
     # Load model
-    if not using_gpu:
-        model_dict = torch.load(model_path, map_location=torch.device('cpu'), weights_only=False)
-    else:
-        model_dict = torch.load(model_path, weights_only=False)
-
-    # Remove module?
-    if remove_module:
-        new_dict = {}
-        for key in model_dict['model'].keys():
-            new_dict[key.replace('module.','')] = model_dict['model'][key]
-        model.load_state_dict(new_dict)
-    else:
-        model.load_state_dict(model_dict['model'])
-    print("Model loaded")
 
     # Create Data Loader for evaluation
     batch_size_eval, num_workers_eval = opt.batch_size_valid, opt.num_workers

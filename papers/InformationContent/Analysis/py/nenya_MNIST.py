@@ -8,14 +8,20 @@ import info_defs
 
 
 def main(task:str):
-    opts_file, mnist_path, preproc_file, latents_file = info_defs.grab_paths('MNIST')
+    dataset = 'MNIST'
+    pdict = info_defs.grab_paths(dataset)
     if task == 'train':
-        workflow.train(opts_file, debug=False)
+        workflow.train(pdict['opts_file'], debug=False)
     elif task == 'evaluate':
-        workflow.evaluate(opts_file, preproc_file, local_model_path=mnist_path,
-                          latents_file=latents_file) 
+        workflow.evaluate(pdict['opts_file'], pdict['preproc_file'], local_model_path=pdict['path'],
+                          latents_file=pdict['latents_file'], clobber=True) 
     elif task == 'chk_latents':
-        workflow.chk_latents('MNIST', latents_file, preproc_file, 100)
+        workflow.chk_latents(dataset, pdict['latents_file'], pdict['preproc_file'], 100)
+    elif task == 'eigenimages':
+        workflow.find_eigenmodes(pdict['opts_file'], pdict['pca_file'], 
+                                 (1,28,28), f'{dataset}_eigenimages.npz',
+                                 local_model_path=pdict['path'],
+                                 num_iterations=10000)
     else:
         raise ValueError(f"Unknown task: {task}")
 

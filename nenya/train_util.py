@@ -15,6 +15,7 @@ from torch.utils.data import Dataset
 
 from nenya.models.resnet_big import SupConResNet
 from nenya.losses import SupConLoss
+from nenya import io as nenya_io
 
 from nenya.util import TwoCropTransform, AverageMeter
 from nenya.util import warmup_learning_rate
@@ -517,15 +518,11 @@ def save_losses(opt, loss_train, loss_step_train, loss_avg_train,
     """
     Save the losses to h5 files.
     """
+    losses_file_train, losses_file_valid = nenya_io.losses_filenames(opt)
 
     # Save the losses
     if not os.path.isdir(f'{opt.model_folder}/learning_curve/'):
         os.mkdir(f'{opt.model_folder}/learning_curve/')
-        
-    losses_file_train = os.path.join(opt.model_folder,'learning_curve',
-                                     f'{opt.model_name}_losses_train.h5')
-    losses_file_valid = os.path.join(opt.model_folder,'learning_curve',
-                                     f'{opt.model_name}_losses_valid.h5')
     
     with h5py.File(losses_file_train, 'w') as f:
         f.create_dataset('loss_train', data=np.array(loss_train))

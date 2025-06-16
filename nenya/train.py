@@ -18,7 +18,8 @@ from nenya.util import adjust_learning_rate
 from IPython import embed
 
 
-def main(opt_path:str, debug:bool=False, load_epoch:int=None):
+def main(opt_path:str, debug:bool=False, load_epoch:int=None,
+         prev_losses_file:str=None):
     """
     Trains a model using the specified parameters.
 
@@ -26,6 +27,8 @@ def main(opt_path:str, debug:bool=False, load_epoch:int=None):
         opt_path (str): The path to the parameters JSON file.
         debug (bool, optional): Whether to run in debug mode. Defaults to False.
         load_epoch (bool, optional): If provided, the model will be loaded from this epoch.
+        prev_losses_file (str): If load epoch is provided, this file will be used to load previous losses.
+
     """
     # loading parameters json file
     opt = params.Params(opt_path)
@@ -45,6 +48,7 @@ def main(opt_path:str, debug:bool=False, load_epoch:int=None):
     optimizer = set_optimizer(opt, model)
 
 
+    # Losses
     loss_train, loss_step_train, loss_avg_train = [], [], []
     loss_valid, loss_step_valid, loss_avg_valid = [], [], []
 
@@ -72,10 +76,20 @@ def main(opt_path:str, debug:bool=False, load_epoch:int=None):
         start_epoch = load_epoch + 1
         print(f"Model Loading Sucessfully!")
 
-        #except Exception as e:
-        #    print(f"Error loading model from {model_file}: {e}")
-        #    print("Training stopped.")
-        #    return
+        # Load losses
+        f = h5py.File(prev_losses_file+'_valid.h5', 'r')
+        loss_valid = f['loss_valid'][:].tolist()
+        loss_step_valid = f['loss_step_valid'][:].tolist()
+        loss_avg_valid = f['loss_avg_valid'][:].tolist()
+        f.close()
+        f = h5py.File(prev_losses_file+'_train.h5', 'r')
+        loss_train = f['loss_train'][:].tolist()
+        loss_step_train = f['loss_step_train'][:].tolist()
+        loss_avg_train = f['loss_avg_train'][:].tolist()
+        f.close()
+        print(f"Losses loaded from {prev_losses_file}")
+        # Check
+        assert len(loss_valid) == load_epoch
 
     # Adjust total epochs if loading from a checkpoint
     if load_epoch is not None and start_epoch > opt.epochs:

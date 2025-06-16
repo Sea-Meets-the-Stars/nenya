@@ -51,11 +51,11 @@ spec:
             git pull; 
             pip install -e ".[dev]";
             cd papers/InformationContent/Analysis;
-            aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp s3://viirs/Nenya/models/VIIRS_N21/SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm/ckpt_epoch_9.pth ./;
+            aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp s3://viirs/Nenya/models/VIIRS_N21/SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm/ckpt_epoch_10.pth ./;
             aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp s3://viirs/Nenya/models/VIIRS_N21/SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm/learning_curve/SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm_losses_train.h5 ./;
             aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp s3://viirs/Nenya/models/VIIRS_N21/SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm/learning_curve/SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm_losses_valid.h5 ./;
             aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp s3://viirs/PreProc/train_VIIRS_N21_2024.h5 ./;
-            python -u nenya_N21.py train;
+            python -u py/nenya_N21.py train;
             aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp models s3://viirs/Nenya/models --recursive --force;
         env:
           - name: "ENDPOINT_URL"

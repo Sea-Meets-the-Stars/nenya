@@ -103,7 +103,7 @@ def main(opt_path:str, debug:bool=False, load_epoch:int=None):
         loss_avg_train = np.array(f['loss_avg_train'][:]).tolist()
         f.close()
         # Check
-        assert len(loss_valid) == load_epoch
+        assert len(loss_valid) == load_epoch, f"Expected {load_epoch} validation losses, got {len(loss_valid)}"
         print(f"Losses loaded")
 
     # Adjust total epochs if loading from a checkpoint

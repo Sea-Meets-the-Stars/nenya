@@ -39,7 +39,8 @@ cdict['VIIRS'] = '#ff7f0e'  # Orange
 cdict['LLC'] = '#2ca02c'  # Green
 # Gray
 cdict['MNIST'] = '#7f7f7f'  # Gray
-cdict['SWOT_SSR'] = '#9467bd'  # Purple
+# Red
+cdict['SWOT_L3'] = '#d62728'  # Red
 
 def dataset_path(dataset:str):
     if dataset == 'SWOT':
@@ -141,7 +142,7 @@ def fig_learning_curves(outfile:str=f'fig_learning_curves.png'):
     """Plot the learning curves for SWOT, VIIRS, MODIS and MNIST datasets."""
     
     # Define the datasets
-    datasets = ['VIIRS', 'MODIS', 'MNIST']
+    datasets = ['VIIRS', 'MODIS', 'MNIST', 'SWOT_L3']
     
     # Create a figure
     fig = plt.figure(figsize=(10, 10))
@@ -149,6 +150,7 @@ def fig_learning_curves(outfile:str=f'fig_learning_curves.png'):
     ax = plt.gca()
 
     for ss, dataset in enumerate(datasets):
+        print(f'Processing dataset: {dataset}')
         clr = cdict[dataset]
         #path = dataset_path(dataset)
         pdict = info_defs.grab_paths(dataset)

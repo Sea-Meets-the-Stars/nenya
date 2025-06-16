@@ -1,6 +1,8 @@
 # Script to train a Nenya model on the 98% cloud free VIIRS data
 #  using v4 model
-# kubectl exec -it test-pod -- /bin/bash
+# ks exec -it xavier-nenya-swot-l3-train-9mcmf -- /bin/bash
+# cd nenya/papers/InformationContent/Analysis/
+# aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp models s3://modis-l2/Nenya/models --recursive --force;
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -54,7 +56,6 @@ spec:
             aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp s3://viirs/Nenya/models/SWOT_L3/SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm/ckpt_epoch_8.pth ./;
             aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp s3://viirs/Nenya/models/SWOT_L3/SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm/learning_curve/SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm_losses_train.h5 ./;
             aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp s3://viirs/Nenya/models/SWOT_L3/SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm/learning_curve/SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm_losses_valid.h5 ./;
-            sleep 300;
             python -u py/nenya_SWOT_L3.py train;
             aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp models s3://viirs/Nenya/models --recursive --force;
         env:

@@ -6,14 +6,15 @@ import info_defs
 from IPython import embed
 
 def main(task:str):
-    opts_file, mnist_path, preproc_file, latents_file = info_defs.grab_paths('SWOT_L3')
+    dataset = 'SWOT_L3'
+    pdict = info_defs.grab_paths(dataset)
     if task == 'train':
-        workflow.train(opts_file, debug=False)
+        workflow.train(pdict['opts_file'], load_epoch=8, debug=False)
     elif task == 'evaluate':
-        workflow.evaluate(opts_file, preproc_file, local_model_path=mnist_path,
-                          latents_file=latents_file) 
+        workflow.evaluate(pdict['opts_file'], pdict['preproc_file'], local_model_path=pdict['path'],
+                          latents_file=pdict['latents_file'])
     elif task == 'chk_latents':
-        workflow.chk_latents('SWOT_L3', latents_file, preproc_file, 100)
+        workflow.chk_latents(dataset, pdict['latents_file'], pdict['preproc_file'], 100)
     else:
         raise ValueError(f"Unknown task: {task}")
 

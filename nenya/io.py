@@ -115,7 +115,7 @@ def load_model(model_path:str, opt, using_gpu:bool,
         model.load_state_dict(model_dict['model'])
     print("Model loaded")
 
-    return model
+    return model, model_dict
 
 
 

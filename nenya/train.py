@@ -46,7 +46,6 @@ def main(opt_path:str, debug:bool=False, load_epoch:int=None):
     # build optimizer
     optimizer = set_optimizer(opt, model)
 
-
     # Losses
     loss_train, loss_step_train, loss_avg_train = [], [], []
     loss_valid, loss_step_valid, loss_avg_valid = [], [], []
@@ -56,7 +55,7 @@ def main(opt_path:str, debug:bool=False, load_epoch:int=None):
     # Load pre-trained model if requested
     if load_epoch is not None:
 
-        # Check for lesses files
+        # Check for losses files
         losses_file_train, losses_file_valid = nenya_io.losses_filenames(opt)
         # Local?
         if not os.path.exists(losses_file_train): 
@@ -73,16 +72,19 @@ def main(opt_path:str, debug:bool=False, load_epoch:int=None):
         if not os.path.exists(model_file):
             print(f"Warning: Model file '{model_file}' not found.")
             print(f"Expected path: {model_file}")
-            print("Training stopped.")
-            return
-
-        #try:
-        print(f"Loading model from epoch {load_epoch}: {model_file}")
-        checkpoint = torch.load(model_file, map_location='cpu' if not opt.cuda_use else 'cuda')
+            print("Looking for it locally")
+            model_file = os.path.basename(model_file)
+            if not os.path.exists(model_file):
+                print(f"Warning: Model file '{model_file}' not found locally.")
+                print("Please check the model folder or the epoch number.")
+                print("Training stopped.")
+                return
 
         # Load model state
-        model.load_state_dict(checkpoint['model'])
-        optimizer.load_state_dict(checkpoint['optimizer'])
+        print(f"Loading model from epoch {load_epoch}: {model_file}")
+        #embed(header='85 of train')
+        model, model_dict = nenya_io.load_model(model_file, opt, opt.cuda_use, remove_module=True)
+        optimizer.load_state_dict(model_dict['optimizer'])
 
         # Set starting epoch
         start_epoch = load_epoch + 1

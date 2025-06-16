@@ -106,7 +106,7 @@ def evaluate(opt_path, pp_file:str, debug=False, clobber=False,
         base_model_name=base_model_name)
 
     # Load model
-    model = nenya_io.load_model(model_name, opt, use_gpu,
+    model, _ = nenya_io.load_model(model_name, opt, use_gpu,
                                remove_module=True, 
                                weights_only=False)
 

@@ -3,14 +3,24 @@
 import os
 import json
 
-from nenya.train import main as train_main
+from nenya import workflow
+import info_defs
 
-def main():
 
-    # Train the model
-    train_main("opts_nenya_viirs.json", debug=False, load_epoch=9)
-    #train_main("opts_nenya_viirs.json", debug=False)
+def main(task:str):
+    dataset = 'VIIRS'
+    pdict = info_defs.grab_paths(dataset)
+    if task == 'train':
+        workflow.train(pdict['opts_file'], load_epoch=9, debug=False)
+    elif task == 'evaluate':
+        workflow.evaluate(pdict['opts_file'], pdict['preproc_file'], local_model_path=pdict['path'],
+                          latents_file=pdict['latents_file'])
+    elif task == 'chk_latents':
+        workflow.chk_latents(dataset, pdict['latents_file'], pdict['preproc_file'], 100)
+    else:
+        raise ValueError(f"Unknown task: {task}")
 
 # Command line execution
 if __name__ == '__main__':
-    main()
+    task = workflow.return_task()
+    main(task)

@@ -2,7 +2,7 @@
 #  using v4 model
 # ks exec -it xavier-nenya-modis-v1-train-2t4df -- /bin/bash
 # cd nenya/papers/InformationContent/Analysis/
-# aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp models s3://viirs/Nenya/models --recursive --force;
+# aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp models s3://modis-l2/Nenya/models --recursive --force;
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -55,7 +55,7 @@ spec:
             cd papers/InformationContent/Analysis;
             aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp s3://modis-l2/PreProc/train_MODIS_2021_128x128.h5 ./;
             python -u py/nenya_MODIS.py train;
-            aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp models s3://viirs/Nenya/models --recursive --force;
+            aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp models s3://modis-l2/Nenya/models --recursive --force;
         env:
           - name: "ENDPOINT_URL"
             value: "http://rook-ceph-rgw-nautiluss3.rook"

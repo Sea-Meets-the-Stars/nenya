@@ -45,9 +45,15 @@ if __name__ == '__main__':
                   #n_cores=15, debug=True)
     '''
 
-    # Prep for Training
+    # Pre-process
+    poptions={
+        'de_mean': True,
+        'median': False, 
+        }
     extract_utils.prep_for_training(os.path.join(tables_path, 'VIIRS_N21_2024.parquet'), 
                       os.path.join(local_extract_path, 'ex_VIIRS_N21_2024.h5'),
                       os.path.join(local_preproc_path, 'train_VIIRS_N21_2024.h5'), 
                       os.path.join(local_tables_path, 'train_VIIRS_N21_2024.parquet'), 
+                      inpaint=True, poptions=poptions,
                       n_train=150000, n_valid=50000)#, debug=True)
+                      #n_train=15000, n_valid=5000)#, debug=True)

@@ -23,6 +23,7 @@ def prep_for_training(tbl_file:str,
                       extract_file:str, 
                       preproc_file:str, 
                       train_tbl_file:str=None,
+                      inpaint:bool=False,
                       n_train:int=300000, 
                       n_valid:int=100000,
                       debug:bool=False,
@@ -66,7 +67,7 @@ def prep_for_training(tbl_file:str,
     # Save the training and validation data
     if not debug:
         # Load h5
-        print("Working on the fields..")
+        print("Loading the fields..")
         fields = f['fields'][:]
         sub_fields = np.zeros((n_train+n_valid, fields.shape[1], fields.shape[2]), 
                               dtype=np.float32)
@@ -74,15 +75,14 @@ def prep_for_training(tbl_file:str,
             sub_fields[kk] = fields[idx]
         del fields
 
-        '''
         # Inpaint
-        print("Inpainting..")
-        inpainted = f['inpainted_masks'][:]
-        for kk, idx in enumerate(idx_tv):
-            fill = np.isfinite(inpainted[idx])
-            sub_fields[kk][fill] = inpainted[idx][fill]
-        del inpainted
-        '''
+        if inpaint:
+            print("Inpainting..")
+            inpainted = f['inpainted_masks'][:]
+            for kk, idx in enumerate(idx_tv):
+                fill = np.isfinite(inpainted[idx])
+                sub_fields[kk][fill] = inpainted[idx][fill]
+            del inpainted
 
         # Preprocess?
         if poptions is not None:

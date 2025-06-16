@@ -53,6 +53,9 @@ spec:
             git pull; 
             pip install -e ".[dev]";
             cd papers/InformationContent/Analysis;
+            aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp s3://viirs/Nenya/models/MODIS_2021/SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm/ckpt_epoch_23.pth ./;
+            aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp s3://viirs/Nenya/models/MODIS_2021/SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm/learning_curve/SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm_losses_train.h5 ./;
+            aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp s3://viirs/Nenya/models/MODIS_2021/SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm/learning_curve/SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm_losses_valid.h5 ./;
             aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp s3://modis-l2/PreProc/train_MODIS_2021_128x128.h5 ./;
             python -u py/nenya_MODIS.py train;
             aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp models s3://modis-l2/Nenya/models --recursive --force;

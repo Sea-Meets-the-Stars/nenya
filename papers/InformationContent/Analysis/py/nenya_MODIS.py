@@ -10,8 +10,6 @@ import info_defs
 
 from IPython import embed
 
-
-
 def main(task:str):
     dataset = 'MODIS'
     pdict = info_defs.grab_paths(dataset)

@@ -21,12 +21,14 @@ from remote_sensing.plotting import utils as rsp_utils
 from wrangler import s3_io
 
 from nenya import plotting as nenya_plotting
+from nenya import params 
+from nenya import io as nenya_io
 
 mpl.rcParams['font.family'] = 'stixgeneral'
 
 # Local
-#sys.path.append(os.path.abspath("../Analysis/py"))
-#import reconstruct
+sys.path.append(os.path.abspath("../Analysis/py"))
+import info_defs
 
 from IPython import embed
 
@@ -35,7 +37,8 @@ cdict = {}
 cdict['MODIS'] = '#1f77b4'  # Blue
 cdict['VIIRS'] = '#ff7f0e'  # Orange
 cdict['LLC'] = '#2ca02c'  # Green
-cdict['MNIST'] = '#d62728'  # Red
+# Gray
+cdict['MNIST'] = '#7f7f7f'  # Gray
 cdict['SWOT_SSR'] = '#9467bd'  # Purple
 
 def dataset_path(dataset:str):
@@ -147,11 +150,15 @@ def fig_learning_curves(outfile:str=f'fig_learning_curves.png'):
 
     for ss, dataset in enumerate(datasets):
         clr = cdict[dataset]
-        path = dataset_path(dataset)
-        valid_file = os.path.join(path, 'learning_curve',
-                                  f'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm_losses_valid.h5')
-        train_file = os.path.join(path, 'learning_curve',
-                                  f'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm_losses_train.h5')
+        #path = dataset_path(dataset)
+        pdict = info_defs.grab_paths(dataset)
+        opt = params.Params('../Analysis/'+pdict['opts_file'])
+        params.option_preprocess(opt)
+        #embed(header=f"Learning curves for {dataset}")
+        losses_train, losses_valid = nenya_io.losses_filenames(opt)
+
+        valid_file = os.path.join(pdict['path'], losses_valid)
+        train_file = os.path.join(pdict['path'], losses_train)
         with s3_io.open(valid_file, 'rb') as f:
             valid_hf = h5py.File(f, 'r')
             loss_valid = valid_hf['loss_valid'][:]

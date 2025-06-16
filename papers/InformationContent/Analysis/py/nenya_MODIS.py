@@ -2,25 +2,21 @@
 
 from importlib import reload
 import os
-import shutil
 
-import h5py
 
-from nenya.train import main as train_main
 from nenya import latents_extraction
-from nenya import analysis
-from nenya import plotting
 from nenya import workflow
+import info_defs
 
 
-opts_file = 'opts_nenya_modis.json'
-
-if 'OS_SST' in os.environ:
-    modis_path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Info')
-    preproc_file = os.path.join(modis_path, 'PreProc', 'train_MODIS_2021_128x128.h5')
-    latents_file = os.path.join(modis_path, 'latents', 'MODIS_2021',
-                        'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm',
-                        'train_MODIS_2021_128x128_latents.h5')
+#opts_file = 'opts_nenya_modis.json'
+#
+#if 'OS_SST' in os.environ:
+#    modis_path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Info')
+#    preproc_file = os.path.join(modis_path, 'PreProc', 'train_MODIS_2021_128x128.h5')
+#    latents_file = os.path.join(modis_path, 'latents', 'MODIS_2021',
+#                        'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm',
+#                        'train_MODIS_2021_128x128_latents.h5')
 
 from IPython import embed
 
@@ -38,6 +34,7 @@ def evaluate():
                 use_gpu=False,
                 debug=False, clobber=True)
 
+'''
 def chk_latents(query_idx:int, partition:str='train', top_N:int=5):
 
     # Grab the latents
@@ -59,16 +56,21 @@ def chk_latents(query_idx:int, partition:str='train', top_N:int=5):
     reload(plotting)
     plotting.closest_latents(images,  similarities,
                           output_png=f'nenya_MODIS_{partition}_chk_latents_{query_idx}.png')
-
+'''
 
 
 def main(task:str):
+    dataset = 'MODIS'
+    pdict = info_defs.grab_paths(dataset)
     if task == 'train':
-        workflow.train(opts_file, debug=False)
+        workflow.train(pdict['opts_file'], load_epoch=23, debug=False)
     elif task == 'evaluate':
-        workflow.evaluate(opts_file, preproc_file, modis_path)
+        # This takes 6 hours on profx with all CPU
+        workflow.evaluate(pdict['opts_file'], pdict['preproc_file'], local_model_path=pdict['path'],
+                          latents_file=pdict['latents_file'],
+                          base_model_name='ckpt_epoch_23.pth')
     elif task == 'chk_latents':
-        workflow.chk_latents('MODIS', latents_file, preproc_file, 100)
+        workflow.chk_latents(dataset, pdict['latents_file'], pdict['preproc_file'], 100)
     else:
         raise ValueError(f"Unknown task: {task}")
 

@@ -28,6 +28,15 @@ def grab_paths(dataset:str):
             #                    'mnist_resampled_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_imagenet.json'
         out_dict['pca_file'] = None
+    elif dataset == 'MODIS':
+        if 'OS_SST' in os.environ:
+            path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Info')
+            out_dict['path'] = path
+            out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'train_MODIS_2021_128x128.h5')
+            out_dict['latents_file'] = os.path.join(path, 'latents', 
+                                'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm',
+                                'train_MODIS_2021_128x128_latents.h5')
+        out_dict['opts_file'] = 'opts_nenya_modis.json'
     elif dataset in ['MODIS_SST_2km', 'MODIS_SST_2km_sub']:
         if 'OS_SST' in os.environ:
             path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Nenya')

@@ -18,8 +18,7 @@ from nenya.util import adjust_learning_rate
 from IPython import embed
 
 
-def main(opt_path:str, debug:bool=False, load_epoch:int=None,
-         prev_losses_file:str=None):
+def main(opt_path:str, debug:bool=False, load_epoch:int=None):
     """
     Trains a model using the specified parameters.
 
@@ -56,6 +55,19 @@ def main(opt_path:str, debug:bool=False, load_epoch:int=None,
     start_epoch = 1
     # Load pre-trained model if requested
     if load_epoch is not None:
+
+        # Check for lesses files
+        losses_file_train, losses_file_valid = nenya_io.losses_filenames(opt)
+        # Local?
+        if not os.path.exists(losses_file_train): 
+            losses_file_train = os.path.basename(losses_file_train)
+            if not os.path.exists(losses_file_train):
+                print(f"Warning: Losses file '{losses_file_train}' not found.")
+                print(f"Expected path: {losses_file_train} [or the full path]")
+                print("Training stopped.")
+                return
+            losses_file_valid = os.path.basename(losses_file_valid)
+
         model_file = os.path.join(opt.model_folder, f'ckpt_epoch_{load_epoch}.pth')
 
         if not os.path.exists(model_file):
@@ -77,19 +89,19 @@ def main(opt_path:str, debug:bool=False, load_epoch:int=None,
         print("Model Loading Sucessfully!")
 
         # Load losses
-        f = h5py.File(prev_losses_file+'_valid.h5', 'r')
+        f = h5py.File(losses_file_valid, 'r')
         loss_valid = np.array(f['loss_valid'][:]).tolist()
         loss_step_valid = np.array(f['loss_step_valid'][:]).tolist()
         loss_avg_valid = np.array(f['loss_avg_valid'][:]).tolist()
         f.close()
-        f = h5py.File(prev_losses_file+'_train.h5', 'r')
+        f = h5py.File(losses_file_train, 'r')
         loss_train = np.array(f['loss_train'][:]).tolist()
         loss_step_train = np.array(f['loss_step_train'][:]).tolist()
         loss_avg_train = np.array(f['loss_avg_train'][:]).tolist()
         f.close()
-        print(f"Losses loaded from {prev_losses_file}")
         # Check
         assert len(loss_valid) == load_epoch
+        print(f"Losses loaded")
 
     # Adjust total epochs if loading from a checkpoint
     if load_epoch is not None and start_epoch > opt.epochs:

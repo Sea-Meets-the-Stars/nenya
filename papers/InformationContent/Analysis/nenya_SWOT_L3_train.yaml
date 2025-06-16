@@ -37,7 +37,6 @@ spec:
             ephemeral-storage: 100Gi
             nvidia.com/gpu:  "4"  # Holding at ~70% usage..
         command: ["/bin/bash", "-c"]
-            #command: ["sh", "-c", "sleep infinity"]
         args:
           - git clone https://github.com/Sea-Meets-the-Stars/wrangler.git;
             cd wrangler;
@@ -52,6 +51,9 @@ spec:
             pip install -e ".[dev]";
             cd papers/InformationContent/Analysis;
             aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp s3://viirs/PreProc/SWOT_L3_250m_preproc.h5 ./;
+            aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp s3://viirs/Nenya/models/SWOT_L3/SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm/ckpt_epoch_8.pth ./;
+            aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp s3://viirs/Nenya/models/SWOT_L3/SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm/learning_curve/SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm_losses_train.h5 ./;
+            aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp s3://viirs/Nenya/models/SWOT_L3/SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm/learning_curve/SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm_losses_valid.h5 ./;
             python -u py/nenya_SWOT_L3.py train;
             aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp models s3://viirs/Nenya/models --recursive --force;
         env:

@@ -11,7 +11,7 @@ def main(task:str):
     dataset = 'VIIRS'
     pdict = info_defs.grab_paths(dataset)
     if task == 'train':
-        workflow.train(pdict['opts_file'], load_epoch=10, debug=False)
+        workflow.train(pdict['opts_file'])#, load_epoch=10, debug=False)
     elif task == 'evaluate':
         workflow.evaluate(pdict['opts_file'], pdict['preproc_file'], local_model_path=pdict['path'],
                           latents_file=pdict['latents_file'])

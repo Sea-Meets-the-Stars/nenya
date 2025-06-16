@@ -74,18 +74,18 @@ def main(opt_path:str, debug:bool=False, load_epoch:int=None,
 
         # Set starting epoch
         start_epoch = load_epoch + 1
-        print(f"Model Loading Sucessfully!")
+        print("Model Loading Sucessfully!")
 
         # Load losses
         f = h5py.File(prev_losses_file+'_valid.h5', 'r')
-        loss_valid = f['loss_valid'][:].tolist()
-        loss_step_valid = f['loss_step_valid'][:].tolist()
-        loss_avg_valid = f['loss_avg_valid'][:].tolist()
+        loss_valid = np.array(f['loss_valid'][:]).tolist()
+        loss_step_valid = np.array(f['loss_step_valid'][:]).tolist()
+        loss_avg_valid = np.array(f['loss_avg_valid'][:]).tolist()
         f.close()
         f = h5py.File(prev_losses_file+'_train.h5', 'r')
-        loss_train = f['loss_train'][:].tolist()
-        loss_step_train = f['loss_step_train'][:].tolist()
-        loss_avg_train = f['loss_avg_train'][:].tolist()
+        loss_train = np.array(f['loss_train'][:]).tolist()
+        loss_step_train = np.array(f['loss_step_train'][:]).tolist()
+        loss_avg_train = np.array(f['loss_avg_train'][:]).tolist()
         f.close()
         print(f"Losses loaded from {prev_losses_file}")
         # Check

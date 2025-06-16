@@ -83,7 +83,8 @@ def main(opt_path:str, debug:bool=False, load_epoch:int=None):
         # Load model state
         print(f"Loading model from epoch {load_epoch}: {model_file}")
         #embed(header='85 of train')
-        model, model_dict = nenya_io.load_model(model_file, opt, opt.cuda_use, remove_module=True)
+        remove_module = False if opt.cuda_use else True
+        model, model_dict = nenya_io.load_model(model_file, opt, opt.cuda_use, remove_module=remove_module)
         optimizer.load_state_dict(model_dict['optimizer'])
 
         # Set starting epoch

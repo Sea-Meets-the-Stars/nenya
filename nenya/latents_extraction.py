@@ -100,6 +100,11 @@ def evaluate(opt_path, pp_file:str, debug=False, clobber=False,
         print(f"Latents file {latents_file} already exists. Skipping extraction.")
         return
 
+    # Ensure the directory exists
+    latents_dir = os.path.dirname(latents_file)
+    if not os.path.exists(latents_dir):
+        os.makedirs(latents_dir)
+
     # Model name and opt
     opt, model_name = nenya_io.load_model_name(
         opt_path, local_model_path=local_model_path,

@@ -33,7 +33,7 @@ def grab_paths(dataset:str):
             path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Info')
             out_dict['path'] = path
             out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'train_MODIS_2021_128x128.h5')
-            out_dict['latents_file'] = os.path.join(path, 'latents', 
+            out_dict['latents_file'] = os.path.join(path, 'latents', 'MODIS_2021',
                                 'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm',
                                 'train_MODIS_2021_128x128_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_modis.json'

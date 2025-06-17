@@ -20,7 +20,7 @@ from IPython import embed
 
 def evaluate(opts_file:str, preproc_file:str, latents_file:str=None,
              local_model_path:str=None, use_gpu:bool=False, clobber:bool=False,
-             base_model_name:str='last.pth'):
+             base_model_name:str='last.pth', debug:bool=False):
     """
     Evaluate the latents extraction process using the specified options and preprocessing files.
 
@@ -40,7 +40,7 @@ def evaluate(opts_file:str, preproc_file:str, latents_file:str=None,
                 local_model_path=local_model_path,
                 latents_file=latents_file,
                 use_gpu=use_gpu,
-                debug=False, clobber=clobber,
+                debug=debug, clobber=clobber,
                 base_model_name=base_model_name)
 
 def chk_latents(dataset:str, latents_file:str, preproc_file:str,

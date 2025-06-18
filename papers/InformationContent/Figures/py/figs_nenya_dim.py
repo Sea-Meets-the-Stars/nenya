@@ -64,11 +64,13 @@ def dataset_path(dataset:str):
     return path
 
 def fig_pca(outfile:str='fig_pca_variance.png',
+            datasets:list=None,
             exponent:float=-0.5): 
 
     # Load PCAs
     ds = []
-    datasets = ['MODIS_SST', 'MODIS_SST_2km', #'MODIS_SST_2km_sub',
+    if datasets is None:
+        datasets = ['MODIS_SST', 'MODIS_SST_2km', #'MODIS_SST_2km_sub',
                 'VIIRS_SST_2km', 
                 'LLC_SST', 
                 #'SWOT_SSR', 
@@ -276,6 +278,31 @@ def main(flg):
     # SWOT UMAP gallery
     if flg == 40:
         fig_swot_umap()
+
+
+    # GRHSST talk
+    if flg == 50:
+        fig_pca(outfile='fig_pca_MODIS.png',
+            datasets=['MODIS_SST'])
+        # MNIST + MODIS
+        fig_pca(outfile='fig_pca_MM.png',
+            datasets=['MODIS_SST', 'MNIST'])
+        # MNIST + MODIS + ImageNet
+        fig_pca(outfile='fig_pca_MMI.png',
+            datasets=['MODIS_SST', 'MNIST',
+                      'ImageNet'])
+        # MODIS + VIIRS
+        fig_pca(outfile='fig_pca_MV.png',
+            datasets=['MODIS_SST', 'VIIRS'])
+        # MODIS + VIIRS + LLC
+        fig_pca(outfile='fig_pca_MVL.png',
+            datasets=['MODIS_SST', 'VIIRS',
+                      'LLC_SST'])
+        # MODIS + VIIRS + LLC + SWOT
+        fig_pca(outfile='fig_pca_MVLS.png',
+            datasets=['MODIS_SST', 'VIIRS',
+                      'LLC_SST', 'SWOT_L3'])
+    
 
 
 # Command line execution

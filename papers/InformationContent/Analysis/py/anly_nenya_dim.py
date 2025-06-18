@@ -33,6 +33,8 @@ def pca_latents(dataset:str):
         key = None
     elif dataset == 'MNIST':
         key = None
+    elif dataset == 'ImageNet':
+        key = None
     else:
         raise IOError("Bad dataset: {}".format(dataset))
 
@@ -44,7 +46,7 @@ if __name__ == '__main__':
     # PCA MODIS SST
     #pca_latents('MODIS_SST_2km')
     #pca_latents('MODIS_SST_2km_sub')
-    pca_latents('MODIS_SST')
+    #pca_latents('MODIS_SST')
 
     #  VIIRS SST
     #pca_latents('VIIRS_SST')
@@ -54,3 +56,6 @@ if __name__ == '__main__':
 
     # MNIST
     #pca_latents('MNIST')
+
+    # ImageNet
+    pca_latents('ImageNet')

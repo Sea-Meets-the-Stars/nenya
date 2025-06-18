@@ -27,7 +27,7 @@ def grab_paths(dataset:str):
                                 'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm',
                                 'imagenet_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_imagenet.json'
-        out_dict['pca_file'] = None
+        out_dict['pca_file'] = 'pca_latents_ImageNet.npz'
     elif dataset == 'MODIS_SST':
         if 'OS_SST' in os.environ:
             path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Info')

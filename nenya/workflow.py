@@ -115,7 +115,7 @@ def find_eigenmodes(opt_path:str, pca_file:str, image_shape:tuple, output_file:s
         base_model_name=base_model_name)
 
     # Load model
-    model = nenya_io.load_model(model_name, opt, use_gpu,
+    model, _ = nenya_io.load_model(model_name, opt, use_gpu,
                                remove_module=True, 
                                weights_only=False)
 

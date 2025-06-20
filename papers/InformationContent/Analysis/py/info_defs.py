@@ -32,7 +32,6 @@ def grab_paths(dataset:str):
         if 'OS_SST' in os.environ:
             path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Nenya')
             out_dict['path'] = path
-            if '2km' in dataset:
             out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'MODIS_R2019_2004_95clear_128x128_preproc_std.h5')
             out_dict['latents_file'] = os.path.join(path,
                         'latents/MODIS_R2019_v4_REDO',

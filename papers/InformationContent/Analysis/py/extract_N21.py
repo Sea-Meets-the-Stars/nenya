@@ -1,6 +1,7 @@
 """ Module to extract the information content of the 2024 data """
 
 import os
+import numpy as np
 
 from wrangler.extract.grab_and_go import run as gg_run
 
@@ -34,26 +35,47 @@ def extract_viirs(dataset:str, eoption_file:str,
         
      
 
+def main(flg):
+    if flg== 'all':
+        flg= np.sum(np.array([2 ** ii for ii in range(25)]))
+    else:
+        flg= int(flg)
+
+    # Learning curves
+    if flg == 1:
+        # Extract N21
+        extract_viirs('VIIRS_N21', 'extract_viirs_std.json', 
+                    'ex_VIIRS_N21_2024.h5', 'VIIRS_N21_2024.parquet',
+                    n_cores=15)#, debug=True)#, debug_async=True, debug=True)
+                    #n_cores=15, debug=True)
+
+    # Pre-process at native resolution
+    if flg == 2:
+        poptions={
+            'de_mean': True,
+            'median': False, 
+            }
+        extract_utils.prep_for_training(os.path.join(tables_path, 'VIIRS_N21_2024.parquet'), 
+                        os.path.join(local_extract_path, 'ex_VIIRS_N21_2024.h5'),
+                        os.path.join(local_preproc_path, 'train_VIIRS_N21_2024.h5'), 
+                        os.path.join(local_tables_path, 'train_VIIRS_N21_2024.parquet'), 
+                        inpaint=True, poptions=poptions,
+                        n_train=150000, n_valid=50000)#, debug=True)
+
+    # Same sample but downscale 3x3 to 64^2
+    if flg == 3:
+        extract_utils.downscale(
+            os.path.join(local_preproc_path, 'train_VIIRS_N21_2024.h5'),
+            os.path.join(local_preproc_path, 'train_VIIRS_N21_2024_2km.h5'),
+            dscale_size=(3, 3), n_cores=15)
+
 # Command line execution
 if __name__ == '__main__':
+    import sys
 
-    '''
-    # Extract N21
-    extract_viirs('VIIRS_N21', 'extract_viirs_std.json', 
-                  'ex_VIIRS_N21_2024.h5', 'VIIRS_N21_2024.parquet',
-                  n_cores=15)#, debug=True)#, debug_async=True, debug=True)
-                  #n_cores=15, debug=True)
-    '''
+    if len(sys.argv) == 1:
+        flg = 0
+    else:
+        flg = sys.argv[1]
 
-    # Pre-process
-    poptions={
-        'de_mean': True,
-        'median': False, 
-        }
-    extract_utils.prep_for_training(os.path.join(tables_path, 'VIIRS_N21_2024.parquet'), 
-                      os.path.join(local_extract_path, 'ex_VIIRS_N21_2024.h5'),
-                      os.path.join(local_preproc_path, 'train_VIIRS_N21_2024.h5'), 
-                      os.path.join(local_tables_path, 'train_VIIRS_N21_2024.parquet'), 
-                      inpaint=True, poptions=poptions,
-                      n_train=150000, n_valid=50000)#, debug=True)
-                      #n_train=15000, n_valid=5000)#, debug=True)
+    main(flg)

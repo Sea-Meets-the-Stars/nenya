@@ -8,6 +8,7 @@ import h5py
 from functools import partial
 from concurrent.futures import ProcessPoolExecutor
 from tqdm import tqdm
+from skimage.transform import downscale_local_mean 
 
 from wrangler.preproc import field as pp_field
 from wrangler.plotting import cutout as plot_cutout
@@ -117,3 +118,42 @@ def prep_for_training(tbl_file:str,
 
         # Push to s3
         print("Upload to s3 yourself!")
+
+def downtime(field, dscale_size:tuple=(3,3)):
+    """Downsample the field by a factor of 3"""
+    return downscale_local_mean(field, dscale_size)
+
+def downscale(native_file:str, new_file:str, dscale_size:tuple,
+              n_cores:int=15): 
+    """Downscale the native resolution file to 64x64
+
+    Args:
+        native_file (str): Path to the native resolution file
+        new_file (str): Path to the new file
+    """
+    map_fn = partial(downtime, dscale_size=dscale_size)
+
+    print(f"Downscaling {native_file} to {new_file}")
+    with h5py.File(native_file, 'r') as f:
+        train = f['train'][:].tolist()
+        valid = f['valid'][:].tolist()
+
+    ntrain = len(train)
+    fields = train + valid
+
+    # Downscale
+    with ProcessPoolExecutor(max_workers=n_cores) as executor:
+        chunksize = len(fields) // n_cores if len(fields) // n_cores > 0 else 1
+        answers = list(tqdm(executor.map(map_fn, fields,
+                                            chunksize=chunksize), 
+                            total=len(fields),
+                            desc='Preprocessing fields',
+                            unit='field'))
+    train = np.array([item[0] for item in answers[0:ntrain]], dtype=np.float32)
+    valid = np.array([item[0] for item in answers[ntrain:]], dtype=np.float32)
+    
+    # Save
+    with h5py.File(new_file, 'w') as nf:
+        nf.create_dataset('train', data=train)
+        nf.create_dataset('valid', data=valid)
+    print(f"Wrote downscaled data to {new_file}")

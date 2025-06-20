@@ -61,7 +61,12 @@ def grab_paths(dataset:str):
     elif dataset == 'VIIRS_SST_2km':
             out_dict['pca_file'] = 'pca_latents_VIIRS_SST_2km.npz'
     elif dataset == 'LLC_SST':
-            out_dict['pca_file'] = 'pca_latents_LLC_SST.npz'
+        if 'OS_OGCM' in os.environ:
+            path = os.path.join(os.getenv('OS_OGCM'), 'LLC', 'Info')
+            out_dict['path'] = path
+            out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'train_LLC4320.h5')
+        out_dict['opts_file'] = 'opts_nenya_llc.json'
+        out_dict['pca_file'] = 'pca_latents_LLC_SST.npz'
     elif dataset == 'SWOT_L3':
         if 'OS_SSH' in os.environ:
             path = os.path.join(os.getenv('OS_SSH'), 'SWOT_L3', 'Info')

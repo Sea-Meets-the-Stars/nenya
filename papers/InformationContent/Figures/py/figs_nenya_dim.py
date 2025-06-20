@@ -35,17 +35,13 @@ from IPython import embed
 # Color eict
 cdict = {}
 cdict['MODIS'] = '#1f77b4'  # Blue
-# Red
-cdict['VIIRS'] = '#d62728'  # Red
+cdict['VIIRS'] = '#ff7f0e'  # Orange
 cdict['LLC'] = '#2ca02c'  # Green
-# Purple
-cdict['MNIST'] = '#9467bd'  # Purple
-# Black
-cdict['ImageNet'] = '#000000'  # Black
-# Orange
-cdict['SWOT_L3'] = '#ff7f0e'  # Orange
+# Gray
+cdict['MNIST'] = '#7f7f7f'  # Gray
+# Red
+cdict['SWOT_L3'] = '#d62728'  # Red
 
-'''
 def dataset_path(dataset:str):
     if dataset == 'SWOT':
         path = os.path.join(os.getenv('SWOT_PNGs'),
@@ -66,12 +62,10 @@ def dataset_path(dataset:str):
     else:
         raise ValueError(f"Dataset {dataset} not supported for learning curve plotting.")
     return path
-'''
 
 def fig_pca(outfile:str='fig_pca_variance.png',
             datasets:list=None,
-            exponent:float=-0.5,
-            use_solid_lines:bool=False): 
+            exponent:float=-0.5): 
 
     # Load PCAs
     ds = []
@@ -106,7 +100,7 @@ def fig_pca(outfile:str='fig_pca_variance.png',
     for ss, d in enumerate(ds):
         if 'sub' in datasets[ss]:
             ls = '--' 
-        elif '2km' in datasets[ss] and not use_solid_lines:
+        elif '2km' in datasets[ss]:
             ls = ':' 
         else:
             ls = '-'
@@ -271,8 +265,7 @@ def main(flg):
 
     # Eigenmodes
     if flg == 3:
-        #fig_eigenimages('MNIST', 'Greys')
-        fig_eigenimages('MODIS_SST', 'jet')
+        fig_eigenimages('MNIST', 'Greys')
 
 
     # SWOT learning curve
@@ -289,8 +282,6 @@ def main(flg):
 
     # GRHSST talk
     if flg == 50:
-        '''
-        # MODIS only
         fig_pca(outfile='fig_pca_MODIS.png',
             datasets=['MODIS_SST'])
         # MNIST + MODIS
@@ -300,20 +291,17 @@ def main(flg):
         fig_pca(outfile='fig_pca_MMI.png',
             datasets=['MODIS_SST', 'MNIST',
                       'ImageNet'])
-        '''
         # MODIS + VIIRS
         fig_pca(outfile='fig_pca_MV.png',
-            datasets=['MODIS_SST', 'VIIRS_SST_2km'],
-            use_solid_lines=True)
+            datasets=['MODIS_SST', 'VIIRS'])
         # MODIS + VIIRS + LLC
         fig_pca(outfile='fig_pca_MVL.png',
-            datasets=['MODIS_SST', 'VIIRS_SST_2km',
-                      'LLC_SST'],
-            use_solid_lines=True)
+            datasets=['MODIS_SST', 'VIIRS',
+                      'LLC_SST'])
         # MODIS + VIIRS + LLC + SWOT
-        #fig_pca(outfile='fig_pca_MVLS.png',
-        #    datasets=['MODIS_SST', 'VIIRS',
-        #              'LLC_SST', 'SWOT_L3'])
+        fig_pca(outfile='fig_pca_MVLS.png',
+            datasets=['MODIS_SST', 'VIIRS',
+                      'LLC_SST', 'SWOT_L3'])
     
 
 

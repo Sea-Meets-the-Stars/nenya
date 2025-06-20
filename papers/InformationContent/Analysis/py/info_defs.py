@@ -28,6 +28,19 @@ def grab_paths(dataset:str):
                                 'imagenet_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_imagenet.json'
         out_dict['pca_file'] = 'pca_latents_ImageNet.npz'
+    elif dataset == 'orig_MODIS_SST_2km':
+        if 'OS_SST' in os.environ:
+            path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Nenya')
+            out_dict['path'] = path
+            if '2km' in dataset:
+            out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'MODIS_R2019_2004_95clear_128x128_preproc_std.h5')
+            out_dict['latents_file'] = os.path.join(path,
+                        'latents/MODIS_R2019_v4_REDO',
+                        'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_256_temp_0.07_trial_5_cosine_warm', 
+                        'MODIS_R2019_2004_95clear_128x128_latents_std.h5')
+        out_dict['opts_file'] = None
+        # 200,000
+        out_dict['pca_file'] = 'pca_latents_MODIS_SST_2km_sub.npz'
     elif dataset == 'MODIS_SST':
         if 'OS_SST' in os.environ:
             path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Info')
@@ -38,28 +51,30 @@ def grab_paths(dataset:str):
                                 'train_MODIS_2021_128x128_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_modis.json'
         out_dict['pca_file'] = 'pca_latents_MODIS_SST.npz'
-    elif dataset in ['MODIS_SST_2km', 'MODIS_SST_2km_sub']:
+    elif dataset == 'MODIS_SST_2km':
         if 'OS_SST' in os.environ:
-            path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Nenya')
+            path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Info')
             out_dict['path'] = path
-            out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'MODIS_R2019_2004_95clear_128x128_preproc_std.h5')
-            out_dict['latents_file'] = os.path.join(path,
-                        'latents/MODIS_R2019_v4_REDO',
-                        'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_256_temp_0.07_trial_5_cosine_warm', 
-                        'MODIS_R2019_2004_95clear_128x128_latents_std.h5')
-        out_dict['opts_file'] = None
-        if dataset == 'MODIS_SST_2km':
-            out_dict['pca_file'] = 'pca_latents_MODIS_SST_2km.npz'
-        elif dataset == 'MODIS_SST_2km_sub':
-            out_dict['pca_file'] = 'pca_latents_MODIS_SST_2km_sub.npz'
+            out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'train_MODIS_2021_64x64.h5')
+            out_dict['latents_file'] = os.path.join(path, 'latents', 'MODIS_2021',
+                                'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm',
+                                'train_MODIS_2021_64x64_latents.h5')
+        out_dict['opts_file'] = 'opts_nenya_modis_2km.json'
+        out_dict['pca_file'] = 'pca_latents_MODIS_SST_2km.npz'
     elif dataset == 'VIIRS':
         if 'OS_SST' in os.environ:
             path = os.path.join(os.getenv('OS_SST'), 'VIIRS', 'Info')
             out_dict['path'] = path
             out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'train_VIIRS_N21_2024.h5')
         out_dict['opts_file'] = 'opts_nenya_viirs.json'
-    elif dataset == 'VIIRS_SST_2km':
-            out_dict['pca_file'] = 'pca_latents_VIIRS_SST_2km.npz'
+    elif dataset == 'VIIRS_2km':
+        if 'OS_SST' in os.environ:
+            path = os.path.join(os.getenv('OS_SST'), 'VIIRS', 'Info')
+            out_dict['path'] = path
+            out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'train_VIIRS_N21_2024_2km.h5')
+        out_dict['opts_file'] = 'opts_nenya_viirs_2km.json'
+    elif dataset == 'orig_VIIRS_SST_2km':
+            out_dict['pca_file'] = 'pca_latents_orig_VIIRS_SST_2km.npz'
     elif 'LLC_SST' in dataset:
         if 'OS_OGCM' in os.environ:
             path = os.path.join(os.getenv('OS_OGCM'), 'LLC', 'Info')

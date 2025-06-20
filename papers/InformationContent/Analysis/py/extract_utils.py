@@ -152,14 +152,24 @@ def downscale(native_file:str, new_file:str, dscale_size:tuple,
     map_fn = partial(downtime, dscale_size=dscale_size)
 
     print(f"Downscaling {native_file} to {new_file}")
+
+    print("Loading")
     with h5py.File(native_file, 'r') as f:
-        train = f['train'][:].tolist()
-        valid = f['valid'][:].tolist()
+        train = f['train'][:]
+        valid = f['valid'][:]
+    print("Done")
+
+    print("Lists")
+    train = [item for item in train]
+    valid = [item for item in valid]
 
     ntrain = len(train)
+    print("Combine")
     fields = train + valid
+    del train, valid
 
     # Downscale
+    print("Downscale")
     with ProcessPoolExecutor(max_workers=n_cores) as executor:
         chunksize = len(fields) // n_cores if len(fields) // n_cores > 0 else 1
         answers = list(tqdm(executor.map(map_fn, fields,
@@ -167,8 +177,9 @@ def downscale(native_file:str, new_file:str, dscale_size:tuple,
                             total=len(fields),
                             desc='Preprocessing fields',
                             unit='field'))
-    train = np.array([item[0] for item in answers[0:ntrain]], dtype=np.float32)
-    valid = np.array([item[0] for item in answers[ntrain:]], dtype=np.float32)
+    #embed(header='182 of downscale')
+    train = np.array([item for item in answers[0:ntrain]], dtype=np.float32)
+    valid = np.array([item for item in answers[ntrain:]], dtype=np.float32)
     
     # Save
     with h5py.File(new_file, 'w') as nf:

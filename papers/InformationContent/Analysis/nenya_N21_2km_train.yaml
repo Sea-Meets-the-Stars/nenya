@@ -1,0 +1,84 @@
+# Script to train a Nenya model on the 98% cloud free VIIRS data
+#  using v4 model
+# ks exec -it xavier-nenya-viirs-n21-train-8zwgd -- /bin/bash
+# cd nenya/papers/InformationContent/Analysis/
+# aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp models s3://viirs/Nenya/models --recursive --force;
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: xavier-nenya-viirs-n21-2km-train
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: NotIn
+                values:
+                  - k8s-chase-ci-01.noc.ucsb.edu
+              - key: nvidia.com/gpu.product
+                operator: In
+                values:
+                  - NVIDIA-A10
+      containers:
+      - name: container
+        image: profxj/ihop_nvidia:latest  # On docker hub
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: "8"   # Using ~4
+            memory: "24Gi"  # Using 13 and climbing..
+            ephemeral-storage: 50Gi
+          limits:
+            cpu: "9"
+            memory: "28Gi"
+            ephemeral-storage: 100Gi
+            nvidia.com/gpu:  "4"  # Holding at 35% usage..
+        command: ["/bin/bash", "-c"]
+            #command: ["sh", "-c", "sleep infinity"]
+        args:
+          - git clone https://github.com/Sea-Meets-the-Stars/wrangler.git;
+            cd wrangler;
+            git fetch;
+            git checkout nasa_ai;
+            git pull;
+            pip install -e ".[dev]";
+            cd ../nenya; 
+            git fetch;
+            git checkout swot; 
+            git pull; 
+            pip install -e ".[dev]";
+            cd papers/InformationContent/Analysis;
+            aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp s3://viirs/PreProc/train_VIIRS_N21_2024_2km.h5 ./;
+            python -u py/nenya_N21_2km.py train;
+            aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp models s3://viirs/Nenya/models --recursive --force;
+        env:
+          - name: "ENDPOINT_URL"
+            value: "http://rook-ceph-rgw-nautiluss3.rook"
+          - name: "S3_ENDPOINT"
+            value: "rook-ceph-rgw-nautiluss3.rook"
+        volumeMounts:
+          - name: prp-s3-credentials
+            mountPath: "/home/jovyan/.aws/credentials"
+            subPath: "credentials"
+          - name: ephemeral
+            mountPath: "/tmp"
+          - name: "dshm"
+            mountPath: "/dev/shm"
+      restartPolicy: Never
+      volumes:
+        # Secrets file for nautilus s3 credentials .aws/credentials and .s3cfg
+        - name: prp-s3-credentials
+          secret:
+            secretName: prp-s3-credentials
+        # Shared memory (necessary for Python's multiprocessing.shared_memory module to work)
+        - name: dshm
+          emptyDir:
+            medium: Memory
+        # Ephemeral storage
+        - name: ephemeral
+          emptyDir: {}

@@ -45,7 +45,7 @@ if __name__ == '__main__':
     #prep_2021_tbl()
 
     # Prep for Training
-    if True:
+    if False:
         # Pre-process
         poptions={
             'de_mean': True,
@@ -58,3 +58,10 @@ if __name__ == '__main__':
                       os.path.join(local_preproc_path, 'train_MODIS_2021_128x128.h5'), 
                       os.path.join(local_tables_path, 'train_MODIS_2021_128x128.parquet'), 
                       n_train=150000, n_valid=50000, poptions=poptions)#, debug=True)
+
+    # Same sample but downscale 2x2 to 64^2
+    if True:
+        extract_utils.downscale(
+            os.path.join(local_preproc_path, 'train_MODIS_2021_128x128.h5'), 
+            os.path.join(local_preproc_path, 'train_MODIS_2021_64x64.h5'), 
+            dscale_size=(2, 2), n_cores=15)

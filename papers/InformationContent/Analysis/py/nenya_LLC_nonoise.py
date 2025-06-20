@@ -1,4 +1,4 @@
-""" Run Nenya on the ImageNet dataset """
+""" Run Nenya on the LLC nonoise dataset """
 
 from nenya import workflow
 import info_defs
@@ -6,10 +6,10 @@ import info_defs
 from IPython import embed
 
 def main(task:str):
-    dataset = 'SWOT_L3'
+    dataset = 'LLC_SST_nonoise'
     pdict = info_defs.grab_paths(dataset)
     if task == 'train':
-        workflow.train(pdict['opts_file'], load_epoch=8, debug=False)
+        workflow.train(pdict['opts_file'], debug=False)
     elif task == 'evaluate':
         workflow.evaluate(pdict['opts_file'], pdict['preproc_file'], local_model_path=pdict['path'],
                           latents_file=pdict['latents_file'], debug=False)

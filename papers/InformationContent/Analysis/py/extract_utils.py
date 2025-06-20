@@ -27,8 +27,10 @@ def prep_for_training(tbl_file:str,
                       inpaint:bool=False,
                       n_train:int=300000, 
                       n_valid:int=100000,
+                      use_ppidx:bool=False,
                       debug:bool=False,
                       poptions:dict=None,
+                      orig_key:str='fields',
                       n_cores:int=20):
     """Prepare the data for training
 
@@ -46,8 +48,20 @@ def prep_for_training(tbl_file:str,
     # Open the table
     df = nenya_io.load_main_table(tbl_file, verbose=True)
 
+    # Cut on pp_idx?
+    if use_ppidx:
+        # Cut the table to the pp_idx
+        df = df[df['pp_idx'] >= 0].copy()
+        print(f"Cutting the table to {len(df)} samples with pp_idx >= 0")
+
     # Random select n_train samples and n_valid samples
     idx_tv = np.random.choice(df.index, n_train+n_valid, replace=False)
+
+    if use_ppidx:
+        ex_idx = df.loc[idx_tv, 'pp_idx'].values
+    else:
+        ex_idx = idx_tv
+        
 
     # Split into training and validation
     df['pp_file'] = preproc_file
@@ -56,7 +70,8 @@ def prep_for_training(tbl_file:str,
     df.loc[idx_tv[:n_train], 'pp_type'] = 1
     # Set valid
     df.loc[idx_tv[n_train:], 'pp_type'] = 0
-    # Indices
+
+    # Indices (they will be aligned)
     df['pp_idx'] = -1
     df.loc[idx_tv[:n_train], 'pp_idx'] = np.arange(n_train)
     df.loc[idx_tv[n_train:], 'pp_idx'] = np.arange(n_valid)
@@ -69,10 +84,13 @@ def prep_for_training(tbl_file:str,
     if not debug:
         # Load h5
         print("Loading the fields..")
-        fields = f['fields'][:]
+        fields = f[orig_key][:]
+        if fields.ndim == 4:
+            # If the fields are 4D, we need to squeeze them
+            fields = fields.squeeze(axis=1)
         sub_fields = np.zeros((n_train+n_valid, fields.shape[1], fields.shape[2]), 
                               dtype=np.float32)
-        for kk, idx in enumerate(idx_tv):
+        for kk, idx in enumerate(ex_idx):
             sub_fields[kk] = fields[idx]
         del fields
 

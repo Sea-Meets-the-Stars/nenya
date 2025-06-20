@@ -1,10 +1,6 @@
 """ Run Nenya on the N21 dataset """
-
-from importlib import reload
 import os
 
-
-from nenya import latents_extraction
 from nenya import workflow
 import info_defs
 
@@ -14,7 +10,7 @@ def main(task:str):
     dataset = 'MODIS_SST_2km'
     pdict = info_defs.grab_paths(dataset)
     if task == 'train':
-        workflow.train(pdict['opts_file'], load_epoch=31, debug=False)
+        workflow.train(pdict['opts_file'], debug=False)
     elif task == 'evaluate':
         # This takes 8 hours on profx with all CPU
         workflow.evaluate(pdict['opts_file'], pdict['preproc_file'], local_model_path=pdict['path'],

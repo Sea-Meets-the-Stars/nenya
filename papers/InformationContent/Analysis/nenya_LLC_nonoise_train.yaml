@@ -54,7 +54,7 @@ spec:
             pip install -e ".[dev]";
             cd papers/InformationContent/Analysis;
             aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp s3://llc/PreProc/train_llc_nonoise.h5 ./;
-            python -u py/nenya_MODIS.py train;
+            python -u py/nenya_LLC_nonoise.py train;
             aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp models s3://modis-l2/Nenya/models --recursive --force;
         env:
           - name: "ENDPOINT_URL"

@@ -1,8 +1,8 @@
 # Script to train a Nenya model on the 98% cloud free VIIRS data
 #  using v4 model
-# ks exec -it xavier-nenya-modis-v1-train-8bknk -- /bin/bash
+# ks exec -it xavier-nenya-llc-nonoise-train-qxkgr -- /bin/bash
 # cd nenya/papers/InformationContent/Analysis/
-# aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp models s3://modis-l2/Nenya/models --recursive --force;
+# aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp models s3://llc/Nenya/models --recursive --force;
 apiVersion: batch/v1
 kind: Job
 metadata:

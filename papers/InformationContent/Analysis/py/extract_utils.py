@@ -138,23 +138,29 @@ def prep_for_training(tbl_file:str,
         print("Upload to s3 yourself!")
 
 def downtime(field, dscale_size:tuple=(3,3)):
-    """Downsample the field by a factor of 3"""
+    """Downsample the field by a factor of dscale"""
     return downscale_local_mean(field, dscale_size)
 
-def downscale(native_file:str, new_file:str, dscale_size:tuple,
+def add_noise(field, noise:float=0.01):
+    field += np.random.normal(loc=0., 
+        scale=noise, 
+        size=field.shape)
+    return field
+
+def modify(orig_file:str, new_file:str, map_fn,
               n_cores:int=15): 
-    """Downscale the native resolution file to 64x64
+    """Modify the original file by the map function
 
     Args:
         native_file (str): Path to the native resolution file
         new_file (str): Path to the new file
     """
-    map_fn = partial(downtime, dscale_size=dscale_size)
+    #map_fn = partial(downtime, dscale_size=dscale_size)
 
-    print(f"Downscaling {native_file} to {new_file}")
+    print(f"Modifying {orig_file} to {new_file}")
 
     print("Loading")
-    with h5py.File(native_file, 'r') as f:
+    with h5py.File(orig_file, 'r') as f:
         train = f['train'][:]
         valid = f['valid'][:]
     print("Done")

@@ -64,10 +64,11 @@ def main(flg):
 
     # Same sample but downscale 3x3 to 64^2
     if flg == 3:
-        extract_utils.downscale(
+        map_fn = extract_utils.partial(extract_utils.downtime, dscale_size=(3,3))
+        extract_utils.modify(
             os.path.join(local_preproc_path, 'train_VIIRS_N21_2024.h5'),
             os.path.join(local_preproc_path, 'train_VIIRS_N21_2024_2km.h5'),
-            dscale_size=(3, 3), n_cores=15)
+            map_fn, n_cores=15)
 
 # Command line execution
 if __name__ == '__main__':

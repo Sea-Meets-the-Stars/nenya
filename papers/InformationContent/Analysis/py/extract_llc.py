@@ -28,6 +28,15 @@ def ex_nonoise():
                     n_train=150000, n_valid=50000,
                     orig_key='valid')
 
+def ex_noise():
+    # Add noise to the original file
+    map_fn = extract_utils.partial(extract_utils.add_noise, noise=0.09)
+    extract_utils.modify(
+        os.path.join(local_preproc_path, 'train_llc_nonoise.h5'),
+        os.path.join(local_preproc_path, 'train_llc_noise.h5'),
+        map_fn, n_cores=15)
+
 # Command line execution
 if __name__ == '__main__':
-    ex_nonoise()
+    #ex_nonoise()
+    ex_noise()

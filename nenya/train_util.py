@@ -320,6 +320,9 @@ def nenya_loader(opt, valid=False):
                                        jitter_lim=opt.random_cropjitter[1],
                                        rescale=0,
                                        verbose=False))
+    if opt.gauss_noise is not None and opt.gauss_noise > 0:
+        augment_list.append(GaussianNoise(
+            instrument_noise=(0.,opt.gauss_noise)))
     if opt.demean:
         augment_list.append(Demean())
 

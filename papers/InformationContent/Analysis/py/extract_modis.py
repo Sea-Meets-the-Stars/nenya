@@ -61,7 +61,9 @@ if __name__ == '__main__':
 
     # Same sample but downscale 2x2 to 64^2
     if True:
-        extract_utils.downscale(
+        map_fn = extract_utils.partial(extract_utils.downtime, dscale_size=(2,2))
+        extract_utils.modify(
             os.path.join(local_preproc_path, 'train_MODIS_2021_128x128.h5'), 
             os.path.join(local_preproc_path, 'train_MODIS_2021_64x64.h5'), 
-            dscale_size=(2, 2), n_cores=15)
+            map_fn,
+            n_cores=15)

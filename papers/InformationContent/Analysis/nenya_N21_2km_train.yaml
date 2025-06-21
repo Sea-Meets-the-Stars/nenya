@@ -1,6 +1,6 @@
 # Script to train a Nenya model on the 98% cloud free VIIRS data
 #  using v4 model
-# ks exec -it xavier-nenya-viirs-n21-train-8zwgd -- /bin/bash
+# ks exec -it xavier-nenya-viirs-n21-2km-train-sq8cb -- /bin/bash
 # cd nenya/papers/InformationContent/Analysis/
 # aws --endpoint http://rook-ceph-rgw-nautiluss3.rook s3 cp models s3://viirs/Nenya/models --recursive --force;
 apiVersion: batch/v1

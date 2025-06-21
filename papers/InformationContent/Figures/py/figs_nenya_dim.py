@@ -73,6 +73,7 @@ def fig_pca(outfile:str='fig_pca_variance.png',
         datasets = ['MODIS_SST', 'MODIS_SST_2km', #'MODIS_SST_2km_sub',
                 'VIIRS_SST_2km', 
                 'LLC_SST', 
+                'SWOT_L3', 
                 #'SWOT_SSR', 
                 'MNIST']
     #datasets = ['MODIS_SST']

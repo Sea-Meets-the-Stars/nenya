@@ -33,6 +33,8 @@ def pca_latents(dataset:str):
         key = None
     elif dataset == 'MNIST':
         key = None
+    elif dataset == 'SWOT_L3':
+        key = None
     elif dataset == 'ImageNet':
         key = None
     else:
@@ -58,4 +60,7 @@ if __name__ == '__main__':
     #pca_latents('MNIST')
 
     # ImageNet
-    pca_latents('ImageNet')
+    #pca_latents('ImageNet')
+
+    # SWOT L3
+    pca_latents('SWOT_L3')

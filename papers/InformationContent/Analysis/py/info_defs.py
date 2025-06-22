@@ -80,9 +80,10 @@ def grab_paths(dataset:str):
             out_dict['path'] = path
             if 'nonoise' in dataset:
                 out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'train_llc_nonoise.h5')
+                out_dict['opts_file'] = 'opts_nenya_llc.json'
             else:
                 out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'train_llc_noise.h5')
-        out_dict['opts_file'] = 'opts_nenya_llc.json'
+                out_dict['opts_file'] = 'opts_nenya_llc_noise.json'
         if 'nonoise' in dataset:
             out_dict['pca_file'] = 'pca_latents_LLC_SST_nonoise.npz'
         else:

@@ -11,11 +11,8 @@ def pca_latents(dataset:str):
     key = 'valid'
     pdict = info_defs.grab_paths(dataset)
     if dataset == 'MODIS_SST_2km':
-        filename = 'MODIS_R2019_2004_95clear_128x128_latents_std.h5'
-        path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2',
-                        'Nenya', 'latents/MODIS_R2019_v4_REDO',
-                        'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_256_temp_0.07_trial_5_cosine_warm')
-    if dataset == 'MODIS_SST_2km_sub':
+        key = None
+    elif dataset == 'MODIS_SST_2km_sub':
         Nmax = 200000
     elif dataset == 'MODIS_SST':
         key = None
@@ -48,7 +45,7 @@ if __name__ == '__main__':
     # PCA MODIS SST
     #pca_latents('MODIS_SST_2km')
     #pca_latents('MODIS_SST_2km_sub')
-    #pca_latents('MODIS_SST')
+    pca_latents('MODIS_SST')
 
     #  VIIRS SST
     #pca_latents('VIIRS_SST')
@@ -63,4 +60,4 @@ if __name__ == '__main__':
     #pca_latents('ImageNet')
 
     # SWOT L3
-    pca_latents('SWOT_L3')
+    #pca_latents('SWOT_L3')

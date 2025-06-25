@@ -52,7 +52,7 @@ def grab_paths(dataset:str):
         out_dict['pca_file'] = 'pca_latents_MODIS_SST.npz'
     elif dataset == 'MODIS_SST_2km':
         if 'OS_SST' in os.environ:
-            path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2_2km', 'Info')
+            path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Info')
             out_dict['path'] = path
             out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'train_MODIS_2021_64x64.h5')
             out_dict['latents_file'] = os.path.join(path, 'latents', 'MODIS_2021_2km',
@@ -60,18 +60,23 @@ def grab_paths(dataset:str):
                                 'train_MODIS_2021_64x64_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_modis_2km.json'
         out_dict['pca_file'] = 'pca_latents_MODIS_SST_2km.npz'
-    elif dataset == 'VIIRS':
+    elif dataset == 'VIIRS_SST':
         if 'OS_SST' in os.environ:
             path = os.path.join(os.getenv('OS_SST'), 'VIIRS', 'Info')
             out_dict['path'] = path
             out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'train_VIIRS_N21_2024.h5')
         out_dict['opts_file'] = 'opts_nenya_viirs.json'
-    elif dataset == 'VIIRS_2km':
+        out_dict['pca_file'] = 'pca_latents_VIIRS_SST.npz'
+    elif dataset == 'VIIRS_SST_2km':
         if 'OS_SST' in os.environ:
             path = os.path.join(os.getenv('OS_SST'), 'VIIRS', 'Info')
             out_dict['path'] = path
             out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'train_VIIRS_N21_2024_2km.h5')
+            out_dict['latents_file'] = os.path.join(path, 'latents', 'VIIRS_2km',
+                                'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm', 
+                                'train_VIIRS_N21_2024_2km_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_viirs_2km.json'
+        out_dict['pca_file'] = 'pca_latents_VIIRS_SST_2km.npz'
     elif dataset == 'orig_VIIRS_SST_2km':
             out_dict['pca_file'] = 'pca_latents_orig_VIIRS_SST_2km.npz'
     elif 'LLC_SST' in dataset:
@@ -80,8 +85,14 @@ def grab_paths(dataset:str):
             out_dict['path'] = path
             if 'nonoise' in dataset:
                 out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'train_llc_nonoise.h5')
+                out_dict['latents_file'] = os.path.join(path, 'latents', 'LLC_SST_nonoise',
+                                'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm',
+                                'train_llc_nonoise_latents.h5')
             else:
                 out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'train_llc_noise.h5')
+                out_dict['latents_file'] = os.path.join(path, 'latents', 'LLC_SST_noise',
+                                'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm',
+                                'train_llc_noise_latents.h5')
         if 'nonoise' in dataset:
             out_dict['opts_file'] = 'opts_nenya_llc.json'
         else:

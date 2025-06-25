@@ -27,7 +27,6 @@ def main(task:str):
                                  (1,128,128), f'{dataset}_eigenimages.npz',
                                  local_model_path=pdict['path'],
                                  num_iterations=3000)#, show=True)
-                                 #num_iterations=500, show=True)
     else:
         raise ValueError(f"Unknown task: {task}")
 

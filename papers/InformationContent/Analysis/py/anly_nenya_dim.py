@@ -16,17 +16,11 @@ def pca_latents(dataset:str):
         Nmax = 200000
     elif dataset == 'MODIS_SST':
         key = None
+    elif dataset == 'VIIRS_SST':
+        key = None
     elif dataset == 'VIIRS_SST_2km':
-        filename = 'VIIRS_2013_98clear_192x192_latents_viirs_std_train.h5'
-        outfile='pca_latents_VIIRS_SST_2km.npz'
-        path = os.path.join(os.getenv('OS_SST'), 'VIIRS',
-                        'Nenya', 'latents', 'VIIRS_v1') 
-    elif dataset == 'LLC_SST':
-        filename = 'LLC_nenya_training.h5'
-        outfile='pca_latents_LLC_SST.npz'
-        path = os.path.join(os.getenv('OS_OGCM'), 'LLC',
-                        'Nenya', 'latents', 'LLC_v1',
-                        'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_256_temp_0.07_trial_5_cosine_warm') 
+        key = None
+    elif 'LLC_SST' in dataset:
         key = None
     elif dataset == 'MNIST':
         key = None
@@ -45,13 +39,14 @@ if __name__ == '__main__':
     # PCA MODIS SST
     #pca_latents('MODIS_SST_2km')
     #pca_latents('MODIS_SST_2km_sub')
-    pca_latents('MODIS_SST')
+    #pca_latents('MODIS_SST')
 
     #  VIIRS SST
     #pca_latents('VIIRS_SST')
+    pca_latents('VIIRS_SST_2km')
 
     #  LLC SST
-    #pca_latents('LLC_SST')
+    #pca_latents('LLC_SST_nonoise')
 
     # MNIST
     #pca_latents('MNIST')

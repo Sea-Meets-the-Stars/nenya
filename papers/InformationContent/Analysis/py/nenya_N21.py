@@ -8,7 +8,7 @@ import info_defs
 
 
 def main(task:str):
-    dataset = 'VIIRS'
+    dataset = 'VIIRS_SST'
     pdict = info_defs.grab_paths(dataset)
     if task == 'train':
         workflow.train(pdict['opts_file'], load_epoch=3, debug=False)

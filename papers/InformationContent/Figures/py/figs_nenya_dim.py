@@ -113,6 +113,8 @@ def fig_pca(outfile:str='fig_pca_variance.png',
     for ss, d in enumerate(ds):
         if 'sub' in datasets[ss]:
             ls = '--' 
+        elif '_noise' in datasets[ss]:
+            ls = '--' 
         elif '2km' in datasets[ss]:
             ls = ':' 
         else:
@@ -343,7 +345,10 @@ def main(flg):
 
     # PCA variaince
     if flg == 2:
-        fig_pca(show_cum_point=0.99)
+        #fig_pca(show_cum_point=0.99)
+        fig_pca(outfile='fig_pca_noise.png',
+            datasets=['MODIS_SST', 'MODIS_SST_2km', 'LLC_SST_nonoise', 'LLC_SST_noise'],
+            show_cum_point=0.99)
 
     # Eigenmodes
     if flg == 3:
@@ -368,12 +373,13 @@ def main(flg):
 
     # GRHSST talk
     if flg == 50:
+        pass
         #fig_pca(outfile='fig_pca_MODIS.png',
         #    datasets=['MODIS_SST', 'MODIS_SST_2km'],
         #    show_cum_point=0.99)
-        fig_pca(outfile='fig_pca_MMV.png',
-            datasets=['MODIS_SST', 'MODIS_SST_2km', 'VIIRS_SST_2km'],
-            show_cum_point=0.99)
+        #fig_pca(outfile='fig_pca_MMV.png',
+        #    datasets=['MODIS_SST', 'MODIS_SST_2km', 'VIIRS_SST_2km'],
+        #    show_cum_point=0.99)
         #fig_pca(outfile='fig_pca_MODIS_cumul.png',
         #    datasets=['MODIS_SST', 'MODIS_SST_2km'],
         #    cumulative=True)

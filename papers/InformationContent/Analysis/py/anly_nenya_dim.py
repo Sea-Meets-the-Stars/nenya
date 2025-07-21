@@ -42,11 +42,12 @@ if __name__ == '__main__':
     #pca_latents('MODIS_SST')
 
     #  VIIRS SST
-    #pca_latents('VIIRS_SST')
-    pca_latents('VIIRS_SST_2km')
+    pca_latents('VIIRS_SST')
+    #pca_latents('VIIRS_SST_2km')
 
     #  LLC SST
     #pca_latents('LLC_SST_nonoise')
+    #pca_latents('LLC_SST_noise')
 
     # MNIST
     #pca_latents('MNIST')

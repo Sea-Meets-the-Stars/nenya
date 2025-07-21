@@ -345,7 +345,10 @@ def main(flg):
 
     # PCA variaince
     if flg == 2:
-        fig_pca(show_cum_point=0.99)
+        #fig_pca(show_cum_point=0.99)
+        fig_pca(outfile='fig_pca_noise.png',
+            datasets=['MODIS_SST', 'MODIS_SST_2km', 'LLC_SST_nonoise', 'LLC_SST_noise'],
+            show_cum_point=0.99)
 
     # Eigenmodes
     if flg == 3:
@@ -380,6 +383,11 @@ def main(flg):
         #fig_pca(outfile='fig_pca_MMVV.png',
         #    datasets=['MODIS_SST', 'MODIS_SST_2km', 
         #              'VIIRS_SST', 'VIIRS_SST_2km'],
+        #fig_pca(outfile='fig_pca_MODIS.png',
+        #    datasets=['MODIS_SST', 'MODIS_SST_2km'],
+        #    show_cum_point=0.99)
+        #fig_pca(outfile='fig_pca_MMV.png',
+        #    datasets=['MODIS_SST', 'MODIS_SST_2km', 'VIIRS_SST_2km'],
         #    show_cum_point=0.99)
         #fig_pca(outfile='fig_pca_MODIS_cumul.png',
         #    datasets=['MODIS_SST', 'MODIS_SST_2km'],

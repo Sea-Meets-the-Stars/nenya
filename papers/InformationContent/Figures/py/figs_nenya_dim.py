@@ -79,8 +79,8 @@ def fig_pca(outfile:str='fig_pca_variance.png',
 
     # Load PCAs
     if datasets is None:
-        datasets = ['MODIS_SST', 'MODIS_SST_2km', #'MODIS_SST_2km_sub',
-                #'VIIRS_SST_2km', 
+        datasets = ['MODIS_SST', #'MODIS_SST_2km_sub',
+                'VIIRS_SST', 
                 'LLC_SST_nonoise', 
                 'SWOT_L3', 
                 #'SWOT_SSR', 
@@ -112,6 +112,8 @@ def fig_pca(outfile:str='fig_pca_variance.png',
     ax = plt.subplot(gs[0])
     for ss, d in enumerate(ds):
         if 'sub' in datasets[ss]:
+            ls = '--' 
+        elif '_noise' in datasets[ss]:
             ls = '--' 
         elif '2km' in datasets[ss]:
             ls = ':' 
@@ -368,12 +370,17 @@ def main(flg):
 
     # GRHSST talk
     if flg == 50:
+        # Just MODIS
+        fig_pca(outfile='fig_pca_MODIS.png',
+            datasets=['MODIS_SST'],
+            show_cum_point=0.99)
         #fig_pca(outfile='fig_pca_MODIS.png',
         #    datasets=['MODIS_SST', 'MODIS_SST_2km'],
         #    show_cum_point=0.99)
-        fig_pca(outfile='fig_pca_MMV.png',
-            datasets=['MODIS_SST', 'MODIS_SST_2km', 'VIIRS_SST_2km'],
-            show_cum_point=0.99)
+        #fig_pca(outfile='fig_pca_MMVV.png',
+        #    datasets=['MODIS_SST', 'MODIS_SST_2km', 
+        #              'VIIRS_SST', 'VIIRS_SST_2km'],
+        #    show_cum_point=0.99)
         #fig_pca(outfile='fig_pca_MODIS_cumul.png',
         #    datasets=['MODIS_SST', 'MODIS_SST_2km'],
         #    cumulative=True)
@@ -382,18 +389,21 @@ def main(flg):
         #    frac_remain=True)
         # MNIST + MODIS
         #fig_pca(outfile='fig_pca_MM.png',
-        #    datasets=['MODIS_SST', 'MNIST'])
+        #    datasets=['MODIS_SST', 'MNIST'],
+        #    show_cum_point=0.99)
         # MNIST + MODIS + ImageNet
         #fig_pca(outfile='fig_pca_MMI.png',
         #    datasets=['MODIS_SST', 'MNIST',
-        #              'ImageNet'])
+        #              'ImageNet'],
+        #    show_cum_point=0.99)
         # MODIS + VIIRS
         #fig_pca(outfile='fig_pca_MV.png',
         #    datasets=['MODIS_SST', 'VIIRS'])
-        # MODIS + VIIRS + LLC
-        #fig_pca(outfile='fig_pca_MVL.png',
-        #    datasets=['MODIS_SST', 'VIIRS',
-        #              'LLC_SST'])
+        # MODIS + LLC (noise)
+        fig_pca(outfile='fig_pca_MLnoise.png',
+            datasets=['MODIS_SST', 
+                      'LLC_SST_nonoise', 'LLC_SST_noise'],
+            show_cum_point=0.99)
         # MODIS + VIIRS + LLC + SWOT
         #fig_pca(outfile='fig_pca_MVLS.png',
         #    datasets=['MODIS_SST', 'VIIRS',

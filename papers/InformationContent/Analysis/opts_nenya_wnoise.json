@@ -21,7 +21,7 @@
     "model_root": "WNoise",
     "sensor": "WNoise",
     "data_folder": "./",
-    "images_file": "wnoise_processed.h5",
+    "images_file": "wnoise_64x64_processed.h5",
     "train_key": "train",
     "valid_key": "valid",
     "orig_tbl_file": "s3://modis-l2/Tables/train_MODIS_2021_128x128.parquet",

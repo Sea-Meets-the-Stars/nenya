@@ -32,7 +32,7 @@ def grab_paths(dataset:str):
         if 'OS_DATA' in os.environ:
             path = os.path.join(os.getenv('OS_DATA'), 'Natural', 'White_Noise', 'Info')
             out_dict['path'] = path
-            out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'wnoise_processed.h5')
+            out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'wnoise_64x64_processed.h5')
             out_dict['latents_file'] = os.path.join(path, 'latents', 'wnoise',
                                 'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm',
                                 'wnoise_latents.h5')

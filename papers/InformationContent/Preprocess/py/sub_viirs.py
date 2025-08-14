@@ -20,12 +20,13 @@ def main(ntrain=150000, nvalid=50000, seed=1234, size=64):
 
     print("Loading images from:", odict_native['preproc_file'])
     with h5py.File(odict_native['preproc_file'], 'r') as f:
-        all_images = [f['valid'][:], f['train'][:]]
+        all_images = [f['train'][:], f['valid'][:]]
+
     # Combine the two sets of images
-    embed(header='combine em')
     all_images = np.concatenate(all_images, axis=0)#[:,0,...]
 
     # Take lower 64x64
+    all_images = all_images[:, 0:size, 0:size]
 
     odict = info_defs.grab_paths(dataset)
     with h5py.File(odict['preproc_file'], 'w') as f:

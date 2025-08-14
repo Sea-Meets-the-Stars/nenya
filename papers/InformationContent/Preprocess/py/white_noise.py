@@ -12,16 +12,16 @@ def main(ntrain=150000, nvalid=50000, seed=1234, size=64):
 
     # Init
     nimg = ntrain+nvalid
-    all_images = np.zeros((nimg, 1, size, size))
+    all_images = np.zeros((nimg, size, size))
 
     # Random generator
     rng = np.random.default_rng(seed)
 
     # Traning
-    all_images[:ntrain] = rng.standard_normal(size=(ntrain, 1, size, size))
+    all_images[:ntrain] = rng.standard_normal(size=(ntrain, size, size))
 
     # Validation
-    all_images[ntrain:] = rng.standard_normal(size=(nvalid, 1, size, size))
+    all_images[ntrain:] = rng.standard_normal(size=(nvalid, size, size))
     
 
     odict = info_defs.grab_paths(dataset)

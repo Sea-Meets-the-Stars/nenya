@@ -18,8 +18,8 @@ def main(ntrain=150000, nvalid=50000, seed=1234, size=64):
     native_dataset = 'VIIRS_SST'
     odict_native = info_defs.grab_paths(native_dataset)
 
-    print("Loading images from:", odict_native['preproc'])
-    with h5py.File(odict_native['preproc'], 'r') as f:
+    print("Loading images from:", odict_native['preproc_file'])
+    with h5py.File(odict_native['preproc_file'], 'r') as f:
         all_images = [f['valid'][:], f['train'][:]]
     # Combine the two sets of images
     embed(header='combine em')

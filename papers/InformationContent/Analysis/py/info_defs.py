@@ -28,6 +28,16 @@ def grab_paths(dataset:str):
                                 'imagenet_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_imagenet.json'
         out_dict['pca_file'] = 'pca_latents_ImageNet.npz'
+    elif dataset == 'WNoise':
+        if 'OS_DATA' in os.environ:
+            path = os.path.join(os.getenv('OS_DATA'), 'Natural', 'White_Noise', 'Info')
+            out_dict['path'] = path
+            out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'wnoise_processed.h5')
+            out_dict['latents_file'] = os.path.join(path, 'latents', 'wnoise',
+                                'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm',
+                                'wnoise_latents.h5')
+        out_dict['opts_file'] = 'opts_nenya_wnoise.json'
+        out_dict['pca_file'] = 'pca_latents_WNoise.npz'
     elif dataset == 'orig_MODIS_SST_2km':
         if 'OS_SST' in os.environ:
             path = os.path.join(os.getenv('OS_SST'), 'MODIS_L2', 'Nenya')
@@ -80,6 +90,16 @@ def grab_paths(dataset:str):
                                 'train_VIIRS_N21_2024_2km_latents.h5')
         out_dict['opts_file'] = 'opts_nenya_viirs_2km.json'
         out_dict['pca_file'] = 'pca_latents_VIIRS_SST_2km.npz'
+    elif dataset == 'VIIRS_SST_sub':  # Native resolution but 64x64 pixels
+        if 'OS_SST' in os.environ:
+            path = os.path.join(os.getenv('OS_SST'), 'VIIRS', 'Info')
+            out_dict['path'] = path
+            out_dict['preproc_file'] = os.path.join(path, 'PreProc', 'train_VIIRS_N21_2024_sub.h5')
+            out_dict['latents_file'] = os.path.join(path, 'latents', 'VIIRS_sub',
+                                'SimCLR_resnet50_lr_0.05_decay_0.0001_bsz_64_temp_0.07_trial_5_cosine_warm', 
+                                'train_VIIRS_N21_2024_sub_latents.h5')
+        out_dict['opts_file'] = 'opts_nenya_viirs_sub.json'
+        out_dict['pca_file'] = 'pca_latents_VIIRS_SST_sub.npz'
     elif dataset == 'orig_VIIRS_SST_2km':
             out_dict['pca_file'] = 'pca_latents_orig_VIIRS_SST_2km.npz'
     elif 'LLC_SST' in dataset:
